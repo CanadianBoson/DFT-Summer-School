@@ -7,16 +7,56 @@
 \author{Ask Hjorth Larsen}
 
 \begin{document}
-\title{High-performance computing}
-  hello world
-\end{document}
+\title{Introduction to high-performance computing}
+%  hello world
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\begin{frame}
+  \frametitle{Floating point numbers}
+  Computational physics mostly boils down to multiplying floating point numbers.
+  \begin{block}{IEEE 754}
+    \begin{itemize}
+    \item Number represented as $M \times 2^n$
+    \item $M$ is the significand or mantissa
+    \item $n$ is the exponent
+    \end{itemize}
+  \end{block}
+  \begin{block}{Important types}
+    \begin{itemize}
+    \item Single precision: 24 bit for $M$, 8 for $n$
+    \item Double precision: 53 bit for $M$, 11 for $n$
+    \end{itemize}
+  \end{block}
+\end{frame}
 
 % Part 1: HPC
 %  * floating point operations
 %  * pipelining
 %  * cache levels
+%  * loop unrolling
 %  * matmul
 %  * BLAS
+
+\begin{frame}
+  \frametitle{BLAS}
+  \framesubtitle{Basic Linear Algebra Subroutines}
+  \begin{itemize}
+  \item Standard interface for standard operations:
+    Matrix multiplication
+  \item Highly optimized for different platforms
+  \end{itemize}
+  \begin{block}{Implementations}
+    \begin{itemize}
+    \item Reference implementation from Netlib
+    \item OpenBlas
+    \item Atlas -- automatically tuned linear algebra software
+    \item Intel MKL
+    \end{itemize}
+  \end{block}
+\end{frame}
 
 % Part 2: Parallelization
 %  * threading
@@ -25,6 +65,39 @@
 %  * Discussion of efficiency
 %  * Examples?  Redist-calculate-redist
 %  * ScaLAPACK
+
+\begin{frame}
+  \frametitle{Parallel programs}
+  \begin{block}{Shared memory}
+    \begin{itemize}
+    \item Different threads work at the same time, can have access to same variables
+    \item If one process reads while another process writes, bad things happen
+    \item Threads must therefore synchronize access to the memory
+    \item Lock, run, unlock
+    \end{itemize}
+  \end{block}
+  \begin{block}{Distributed memory}
+    \begin{itemize}
+    \item Each process has its own chunk of memory, probably on different physical computers
+    \item No problem with synchronizing memory (unless also threading)
+    \item Must manually send/receive all data
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel deadlocks}
+  \begin{itemize}
+  \item Resource A is blocked by process N
+  \item Process N waits for resource B
+  \item Resource B is blocked by process M
+  \item Process M waits for resource A
+  %\item Process A expects 10 bytes from process B
+  %\item Process B sends only 5 bytes
+  %\item Process A holds resource X, waits for resource Y
+  %\item Process B holds resource Y, waits for resource X
+  \end{itemize}
+\end{frame}
 
 % Part 3: Supercomputers
 %  * Normal clusters
@@ -71,3 +144,5 @@
 % ScaLAPACK
 
 % Scripting: Python, numpy, scipy
+
+\end{document}
