@@ -40,7 +40,7 @@ ax.set_xticks(Mval[:N])
 sizes = 3 * np.array(Mval[:N])**2 * 8 / 1e6
 ax.set_xticklabels(['{}\n{:.1f} MB'.format(M, size)
                     for M, size in zip(Mval[:N], sizes)], rotation=45)
-ax.axis(xmin=Mval[0], xmax=Mval[N - 1])
+ax.axis(xmin=Mval[0], xmax=Mval[N - 1], ymax=1e2)
 
 ax.legend(loc='upper left', ncol=3)
 ax.set_xlabel('Matrix size & total memory allocation')
