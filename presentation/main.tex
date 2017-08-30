@@ -15,9 +15,11 @@
 
 
 \author{Ask Hjorth Larsen}
+\title{Introduction to high-performance computing}
+\institute{Nano-bio Spectroscopy Group and ETSF Scientific Development Centre,\\
+Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
 
 \begin{document}
-\title{Introduction to high-performance computing}
 %  hello world
 
 \begin{frame}
@@ -96,8 +98,9 @@
   \begin{itemize}
   \item We know that jumping around in memory when retrieving data is bad
   \item Jumping around in the \emph{code} is also bad as it breaks pipelining
-  \item Branching constructes are: \texttt{if} statements, function calls, \texttt{goto}, \ldots
-  \item Avoid branching as much as possible, particularly in inner loops
+  \item Avoid branching in high-performance loops: \texttt{if} statements, function calls, \texttt{goto}, \ldots
+  \item Jump can be eliminated by \alert{inlining} --- include the source of a function ``inline'' in place of calling the function, e.g.\ using a macro
+  \item Also: \texttt{inline double myfunction(...)}
   \end{itemize}
 \end{frame}
 
@@ -115,7 +118,7 @@
     Main memory & 32 GB, shared & $36\textsf{ cycles} + 57$ ns & 68 ns\\\hline\hline
   \end{tabular}
   Source: \url{http://www.7-cpu.com/cpu/Haswell.html}
-  %\medskip
+  \bigskip
   \begin{itemize}
   \item When accessing memory, contiguous chunks of memory will be copied into cache
   \item Cached memory access is very efficient
@@ -204,7 +207,8 @@ Different permutations of $\{ikj\}$ loops will perform differently
 \begin{frame}
   \begin{figure}
   \includegraphics[width=\textwidth]{code/timings-matmul}
-  \caption{Timings for matrix multiplication with different loop order}
+  \caption{Timings for matrix multiplication with different loop order
+  at \texttt{-O2} optimization level}
   \end{figure}
 \end{frame}
 
@@ -232,26 +236,77 @@ vs
 \end{lstlisting}
 \begin{itemize}
 \item Eliminates bounds check on \texttt{i}
-\item Compiler may be able to unroll automatically.
+\item Compiler may be able to unroll automatically (e.g.~\texttt{-funroll-loops}).
 \end{itemize}
 \end{frame}
 
 \begin{frame}
+  \frametitle{Blocking}
+  \begin{itemize}
+  \item
+  Compute $\mathbf C = \mathbf A \mathbf B$ where each matrix is composed into
+  blocks:
+  \begin{align}
+    \mathbf A = \left[
+      \begin{matrix}
+        \mathbf A_{11} &\cdots& \mathbf A_{1n}\\
+        \vdots & & \vdots \\
+        \mathbf A_{n1} & \cdots & \mathbf A_{nn}
+      \end{matrix}\right]
+  \end{align}
+
+\item Matrix product expressed with blocks:
+  \begin{align}
+    \mathbf C_{ij} = \sum_{k} \mathbf A_{ik} \mathbf B_{kj}
+  \end{align}
+  \item Work on smaller blocks that fit into cache
+  \item Optimal blocksize depends on architecture (e.g.\ cache size)
+  \item Matrix product scales as $\mathcal O(N^3)$
+  \item Blocking improves $\mathcal O(N^3)$ prefactor by working on
+    chunks that fit in cache
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
   \frametitle{BLAS}
-  \framesubtitle{Basic Linear Algebra Subroutines}
+  \framesubtitle{Basic Linear Algebra Subprograms}
   \begin{itemize}
   \item Standard interface for standard operations:
     Matrix multiplication
   \item Highly optimized for different platforms
   \end{itemize}
-  \begin{block}{Implementations}
+  \begin{block}{Some BLAS implementations}
     \begin{itemize}
-    \item Reference implementation from Netlib
-    \item OpenBlas
+    \item RefBlas --- reference implementation from Netlib
+    \item OpenBlas (based on older GotoBlas)
     \item Atlas -- automatically tuned linear algebra software
     \item Intel MKL
+    \item AMD ACML
     \end{itemize}
   \end{block}
+\end{frame}
+
+\begin{frame}
+  \begin{block}{Some BLAS functions}
+    \begin{itemize}
+    \item \texttt{dgemm}: \alert double-precision \alert{ge}neral \alert matrix--\alert matrix multiply
+    \item \texttt{dsymv}: \alert double-precision \alert{sy}mmetric \alert matrix--\alert vector multiply
+    \item \texttt{daxpy}: double-precision $\alert{a \mathbf X}\textrm{ \alert plus } \alert y$
+    \item \texttt{zsyr2k}: ``complex double-precision (\alert z) \alert{sy}mmetric \alert ran\alert{k-2} update'',
+      $\mathbf X \mathbf Y^T + \mathbf Y \mathbf X^T$
+    \item Etc.
+    \end{itemize}
+  \end{block}
+  \begin{block}{LAPACK, Linear Algebra PACKage}
+    \begin{itemize}
+    \item Higher-level linear algebra operations
+    \item LU-decomposition, eigenvalues, \ldots
+    \item dsyev: \alert double-precision \alert{sy}mmetric \alert eigen{\alert v}alues
+    \item Etc.
+    \end{itemize}
+  \end{block}
+  For best performance, use BLAS/LAPACK whenever possible
 \end{frame}
 
 % Part 2: Parallelization
