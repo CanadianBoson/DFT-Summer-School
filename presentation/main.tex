@@ -3,6 +3,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{listings}
 
 \author{Ask Hjorth Larsen}
 
@@ -17,20 +18,118 @@
 \begin{frame}
   \frametitle{Floating point numbers}
   Computational physics mostly boils down to multiplying floating point numbers.
-  \begin{block}{IEEE 754}
+  \begin{block}{IEEE 754 standard for floating point numbers}
     \begin{itemize}
-    \item Number represented as $M \times 2^n$
+    \item Number is represented as $M \times 2^n$
     \item $M$ is the significand or mantissa
     \item $n$ is the exponent
     \end{itemize}
   \end{block}
   \begin{block}{Important types}
     \begin{itemize}
-    \item Single precision: 24 bit for $M$, 8 for $n$
-    \item Double precision: 53 bit for $M$, 11 for $n$
+    \item 32-bit single precision: 24 bit for $M$, 8 for $n$
+    \item 64-bit double precision: 53 bit for $M$, 11 for $n$
     \end{itemize}
   \end{block}
 \end{frame}
+
+
+\begin{frame}
+  \frametitle{Pipelining}
+  \begin{itemize}
+  \item 
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Branching}
+  \begin{itemize}
+  \item We know that jumping around in memory when retrieving data is bad
+  \item Jumping around in the \emph{code} is also bad as it breaks pipelining
+  \item Branching constructes are: \texttt{if} statements, function calls, \texttt{goto}, \ldots
+  \item Avoid branching as much as possible, particularly in inner loops
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Memory and multilevel caching}
+  Example: Intel i7-4770 Haswell architecture\\
+  \medskip
+  \begin{tabular}{llll}
+     & Size & Latency & Total \\
+    \hline\hline
+    L1 cache & 64 KB/core & 4--5 cycles & 1.3 ns\\
+    L2 cache & 256 KB/core & 12 cycles & 3.5 ns \\
+    L3 cache & 8 MB, shared & 36 cycles & 11 ns\\
+    Main memory & 32 GB, shared & $36\textsf{ cycles} + 57$ ns & 68 ns\\\hline\hline
+  \end{tabular}
+  Source: \url{http://www.7-cpu.com/cpu/Haswell.html}
+  %\medskip
+  \begin{itemize}
+  \item When accessing memory, contiguous chunks of memory will be copied into cache
+  \item Cached memory access is very efficient
+  \item A failed cache lookup is called a ``cache miss''
+  \item Upon cache miss, element is looked up at next (slower) level
+  \end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Arrays and memory layout}
+  \begin{itemize}
+  \item  Standard mathematical matrix notation:
+  \begin{align}
+    \left[
+  \begin{matrix}
+    1,1 & 1,2 & 1,3 \\
+    2,1 & 2,2 & 2,3 \\
+    3,1 & 3,2 & 3,3
+  \end{matrix}
+  \right]
+  \end{align}
+\item Elements of the array are stored in a \alert{contiguous} chunk of memory,
+  but the ordering depends on language
+\item Fortran memory order is \alert{column-major}:
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+    \hline
+     $1,1$&$2,1$&$3,1$&$1,2$&$2,2$&$3,2$&$1,3$&$2,3$&$3,3$ \\\hline
+  \end{tabular}
+\item C memory order is \alert{row-major}:
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+    \hline
+     $1,1$&$1,2$&$1,3$&$2,1$&$2,2$&$2,3$&$3,1$&$3,2$&$3,3$ \\\hline
+  \end{tabular}
+\item Accessing elements in memory order is fast.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Optimizing cache use}
+  \begin{itemize}
+  \item Work on contiguous chunks of memory
+  \end{itemize}
+\begin{lstlisting}
+for(i=0; i < N; i++) {
+  for(j=0; j < M; j++) {
+    a[i * N + j] = ...
+  }
+}
+\end{lstlisting}
+vs
+\begin{lstlisting}
+for(j=0; j < M; j++) {
+  for(i=0; i < N; i++) {
+    a[i * N + j] = ...
+  }
+}
+\end{lstlisting}
+\end{frame}
+
+
+
 
 % Part 1: HPC
 %  * floating point operations
@@ -39,6 +138,26 @@
 %  * loop unrolling
 %  * matmul
 %  * BLAS
+
+\begin{frame}[fragile]
+  \frametitle{Loop unrolling}
+\begin{lstlisting}
+for(i=0; i < 4; i++) {
+    a[i] = b[i] * c[i];
+}
+\end{lstlisting}
+vs
+\begin{lstlisting}
+  a[i] = b[i] * c[i];
+  a[i + 1] = b[i + 1] * c[i + 1];
+  a[i + 2] = b[i + 2] * c[i + 2];
+  a[i + 3] = b[i + 3] * c[i + 3];
+\end{lstlisting}
+\begin{itemize}
+\item Eliminates bounds check on \texttt{i}
+\item Compiler may be able to unroll automatically.
+\end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{BLAS}
