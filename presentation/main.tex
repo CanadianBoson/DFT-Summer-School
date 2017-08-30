@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[usenames,dvipsnames,mathserif,compress]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
@@ -8,7 +8,7 @@
 \lstset{%,
   basicstyle=\small\ttfamily,
   keywordstyle=\color{red},
-  identifierstyle=\color{blue},
+  identifierstyle=\color{Blue},
   stringstyle=\color{yellow},
   showstringspaces=false,
   language=C}%,
@@ -48,6 +48,19 @@
   \begin{itemize}
   \item In one cycle, perform multiple operations on different data
   \item Pipelining
+    \begin{tabular}{c|cccccccccccc}
+      & u1 &u2&u3&u4&u5&u6&u7&\\\hline
+      Cycle 1 & A &ø&ø&ø&ø&ø&ø& \\
+      Cycle 2 & B & A &ø&ø&ø&ø&ø& \\
+      Cycle 3 & C & B & A &ø&ø&ø&ø& \\
+      Cycle 4 & D & C & B & A &ø&ø&ø& \\
+      Cycle 5 & E & D & C & B & A &ø&ø& \\
+      Cycle 6 & ø & E & D & C & B & A &ø& \\
+      Cycle 7 & ø & ø & E & D & C & B & A \\
+      Cycle 8 & ø & ø & ø & E & D & C & B \\
+      Cycle 9 & ø & ø & ø & ø & E & D & C \\
+      Cycle 10 &ø & ø & ø & ø & ø & E & D \\
+    \end{tabular}
   \end{itemize}
 \end{frame}
 
@@ -157,7 +170,7 @@ void matmul_ikj(int I, int J, int K,
   }
 }
 \end{lstlisting}
-Different permutations of $\{ikj\}$ will perform differently
+Different permutations of $\{ikj\}$ loops will perform differently
 \end{frame}
 
 
