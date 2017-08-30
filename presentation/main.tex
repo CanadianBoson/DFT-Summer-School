@@ -25,6 +25,27 @@
 \end{frame}
 
 \begin{frame}
+  \begin{block}{The CPU}
+    \begin{itemize}
+    \item The CPU reads \alert{instructions and inputs}, then performs those instructions on the inputs
+    \item Instruction codes and inputs are stored in workspaces
+      on the CPU called \alert{registers}
+    \item Each cycle, the CPU can execute an instruction; different
+      CPU architectures support different instructions
+    \end{itemize}
+  \end{block}
+  \begin{block}{Example}
+    \begin{itemize}
+    \item Retrieve number from address A, put it in register R
+    \item Add numbers from registers R and R', store sum in R''
+    \item Write number from R'' to address A'
+    \item Etc.
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+
+\begin{frame}
   \frametitle{Floating point numbers}
   Computational physics mostly boils down to multiplying floating point numbers.
   \begin{block}{IEEE 754 standard for floating point numbers}
@@ -40,32 +61,38 @@
     \item 64-bit double precision: 53 bit for $M$, 11 for $n$
     \end{itemize}
   \end{block}
+  Floating point operations are complex.
+  Modern CPUs have one or more \alert{floating point units} (FPUs)
+  that execute floating point operations efficiently
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Pipelining}
   \begin{itemize}
-  \item In one cycle, perform multiple operations on different data
-  \item Pipelining
+  \item Different ``units'' process different parts of multi-step operation
+  \item Illustration of pipelining for 4-step operation running 6 times:\\
+    \begin{table}
     \begin{tabular}{c|cccccccccccc}
-      & u1 &u2&u3&u4&u5&u6&u7&\\\hline
-      Cycle 1 & A &ø&ø&ø&ø&ø&ø& \\
-      Cycle 2 & B & A &ø&ø&ø&ø&ø& \\
-      Cycle 3 & C & B & A &ø&ø&ø&ø& \\
-      Cycle 4 & D & C & B & A &ø&ø&ø& \\
-      Cycle 5 & E & D & C & B & A &ø&ø& \\
-      Cycle 6 & ø & E & D & C & B & A &ø& \\
-      Cycle 7 & ø & ø & E & D & C & B & A \\
-      Cycle 8 & ø & ø & ø & E & D & C & B \\
-      Cycle 9 & ø & ø & ø & ø & E & D & C \\
-      Cycle 10 &ø & ø & ø & ø & ø & E & D \\
+      & u1 &u2&u3&u4\\\hline
+      Cycle 1 & A$^1$ &ø&ø&ø \\
+      Cycle 2 & B$^1$ & A$^2$ &ø&ø \\
+      Cycle 3 & C$^1$ & B$^2$ & A$^3$ &ø \\
+      Cycle 4 & D$^1$ & C$^2$ & B$^3$ & A$^4$  \\
+      Cycle 5 & E$^1$ & D$^2$ & C$^3$ & B$^4$   \\
+      Cycle 6 & F$^1$ & E$^2$ & D$^3$ & C$^4$  \\
+      Cycle 7 & ø     & F$^2$ & E$^3$ & D$^4$  \\
+      Cycle 8 & ø & ø & F$^3$ & E$^4$  \\
+      Cycle 9 & ø & ø & ø & F$^4$  \\
     \end{tabular}
+    \end{table}
+  \item Clock cycles are wasted while pipeline flushes or fills
+  \item Pipelining depends on predictability: Next input element must be readily available
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Branching}
+  \frametitle{Branching and pipelining}
   \begin{itemize}
   \item We know that jumping around in memory when retrieving data is bad
   \item Jumping around in the \emph{code} is also bad as it breaks pipelining

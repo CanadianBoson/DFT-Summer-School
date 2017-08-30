@@ -166,12 +166,6 @@ void test(int M)
     printf("jki %e\n", matmul_jki(I, J, K, A, B, C));
     printf("kji %e\n", matmul_kji(I, J, K, A, B, C));
 
-    double sum = 0;
-    for(i=0; i < I * J; i++) {
-        sum += C[i];
-    }
-    //printf("sum %e\n", sum);
-
     free(A);
     free(B);
     free(C);
@@ -179,22 +173,6 @@ void test(int M)
 
 int main(int argc, char **argv)
 {
-    double size = 10;
-    for(;;) {
-        test((int)size);
-        size *= sqrt(2);
-        if(size > 300) {
-            break;
-        }
-    }
-    //test(200);
-    //test(280);
-    //test(400);
-    //test(560);
-    //test(800);
-    //test(1120);
-    //test(1600);
-    //test(2240);
-    //test(3200);
+    test(1000);
     return 0;
 }
