@@ -5,6 +5,15 @@
 \usepackage{amssymb}
 \usepackage{listings}
 
+\lstset{%,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{red},
+  identifierstyle=\color{blue},
+  stringstyle=\color{yellow},
+  showstringspaces=false,
+  language=C}%,
+
+
 \author{Ask Hjorth Larsen}
 
 \begin{document}
@@ -37,7 +46,8 @@
 \begin{frame}
   \frametitle{Pipelining}
   \begin{itemize}
-  \item 
+  \item In one cycle, perform multiple operations on different data
+  \item Pipelining
   \end{itemize}
 \end{frame}
 
@@ -128,8 +138,35 @@ for(j=0; j < M; j++) {
 \end{lstlisting}
 \end{frame}
 
+\begin{frame}[fragile]
+  \frametitle{Benchmark}
+  \begin{align}
+    \hspace{-2cm} \textrm{Matrix multiplication}\quad c_{ij} &= \sum_k a_{ik} b_{kj}\nonumber
+  \end{align}
+\begin{lstlisting}
+void matmul_ikj(int I, int J, int K,
+                double *A, double *B, double *C)
+{
+  int i, j, k;
+  for(i=0; i < I; i++) {
+    for(k=0; k < K; k++) {
+      for(j=0; j < J; j++) {
+        C[i * J + j] += A[i * K + k] * B[k * J + j];
+      }
+    }
+  }
+}
+\end{lstlisting}
+Different permutations of $\{ikj\}$ will perform differently
+\end{frame}
 
 
+\begin{frame}
+  \begin{figure}
+  \includegraphics[width=\textwidth]{code/timings-matmul}
+  \caption{Timings for matrix multiplication with different loop order}
+  \end{figure}
+\end{frame}
 
 % Part 1: HPC
 %  * floating point operations
