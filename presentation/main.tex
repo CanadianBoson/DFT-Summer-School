@@ -5,6 +5,9 @@
 \usepackage{amssymb}
 \usepackage{listings}
 
+\useoutertheme{miniframes}
+\usecolortheme{dolphin}
+
 \lstset{%,
   basicstyle=\small\ttfamily,
   keywordstyle=\color{red},
@@ -26,6 +29,9 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
 \begin{frame}
   \maketitle
 \end{frame}
+
+\section*{Introduction}
+\subsection*{}
 
 \begin{frame}
   \begin{block}{The CPU}
@@ -69,12 +75,23 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   that execute floating point operations efficiently
 \end{frame}
 
+\section*{Number crunching}
+\subsection*{Pipelining}
+
+\begin{frame}
+  \frametitle{}
+  \begin{itemize}
+  \item Most time is probably spent with floating point operations
+  \item The actual floating point numbers are only part of the work
+  \item Important: Retrieve data from memory efficiently
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{Pipelining}
   \begin{itemize}
-  \item Different ``units'' process different parts of multi-step operation
-  \item Illustration of pipelining for 4-step operation running 6 times:\\
+  \item Consider a 4-step operation where different ``units'' can process
+    different steps simultaneously
     \begin{table}
     \begin{tabular}{c|cccccccccccc}
       & u1 &u2&u3&u4\\\hline
@@ -89,22 +106,24 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
       Cycle 9 & ø & ø & ø & F$^4$  \\
     \end{tabular}
     \end{table}
-  \item Clock cycles are wasted while pipeline flushes or fills
-  \item Pipelining depends on predictability: Next input element must be readily available
+  \item Can execute up to one whole operation per cycle, but cycles
+    may be wasted flushing/filling the pipeline
+  \item Next input element must be readily available
   \end{itemize}
 \end{frame}
 
 \begin{frame}
   \frametitle{Branching and pipelining}
   \begin{itemize}
-  \item We know that jumping around in memory when retrieving data is bad
-  \item Jumping around in the \emph{code} is also bad as it breaks pipelining
-  \item Avoid branching in high-performance loops: \texttt{if} statements, function calls, \texttt{goto}, \ldots
+  \item Jumping around in memory breaks the pipeline
+  \item Avoid \alert{branching} in high-performance loops: \texttt{if} statements, function calls, \texttt{goto}, \ldots
   \item Jump can be eliminated by \alert{inlining} --- include the source of a function ``inline'' in place of calling the function, e.g.\ using a macro
-  \item Also: \texttt{inline double myfunction(...)}
+  \item Also: \lstinline{inline double myfunction(...)}
   \end{itemize}
 \end{frame}
 
+
+\subsection*{Caching}
 
 \begin{frame}
   \frametitle{Memory and multilevel caching}
@@ -166,21 +185,23 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   \item Work on contiguous chunks of memory
   \end{itemize}
 \begin{lstlisting}
-for(i=0; i < N; i++) {
-  for(j=0; j < M; j++) {
-    a[i * N + j] = ...
+for(i=0; i < I; i++) {
+  for(j=0; j < J; j++) {
+    a[i * J + j] = ... // fast
   }
 }
 \end{lstlisting}
 vs
 \begin{lstlisting}
-for(j=0; j < M; j++) {
-  for(i=0; i < N; i++) {
-    a[i * N + j] = ...
+for(j=0; j < J; j++) {
+  for(i=0; i < I; i++) {
+    a[i * J + j] = ... // slow
   }
 }
 \end{lstlisting}
 \end{frame}
+
+\subsection*{Matrix multiplication}
 
 \begin{frame}[fragile]
   \frametitle{Benchmark}
@@ -207,8 +228,8 @@ Different permutations of $\{ikj\}$ loops will perform differently
 
 \begin{frame}
   \begin{figure}
-  \includegraphics[width=\textwidth]{code/timings-matmul}
-  \caption{Timings for matrix multiplication with different loop order
+  \includegraphics[width=.95\textwidth]{code/timings-matmul}
+  \caption{Timings for matrix multiplication
   at \texttt{-O2} optimization level}
   \end{figure}
 \end{frame}
@@ -222,21 +243,21 @@ Different permutations of $\{ikj\}$ loops will perform differently
 %  * BLAS
 
 \begin{frame}[fragile]
-  \frametitle{Loop unrolling}
+\frametitle{Loop unrolling}
+\begin{itemize}
+\item Unrolling eliminates a fraction of loop bounds checks.
 \begin{lstlisting}
 for(i=0; i < 4; i++) {
     a[i] = b[i] * c[i];
 }
 \end{lstlisting}
-vs
+\item Unrolled:
 \begin{lstlisting}
-  a[i] = b[i] * c[i];
-  a[i + 1] = b[i + 1] * c[i + 1];
-  a[i + 2] = b[i + 2] * c[i + 2];
-  a[i + 3] = b[i + 3] * c[i + 3];
+a[i] = b[i] * c[i];
+a[i + 1] = b[i + 1] * c[i + 1];
+a[i + 2] = b[i + 2] * c[i + 2];
+a[i + 3] = b[i + 3] * c[i + 3];
 \end{lstlisting}
-\begin{itemize}
-\item Eliminates bounds check on \texttt{i}
 \item Compiler may be able to unroll automatically (e.g.~\texttt{-funroll-loops}).
 \end{itemize}
 \end{frame}
@@ -268,14 +289,16 @@ vs
   \end{itemize}
 \end{frame}
 
+\subsection*{BLAS and LAPACK}
 
 \begin{frame}
   \frametitle{BLAS}
-  \framesubtitle{Basic Linear Algebra Subprograms}
+  \begin{block}{Basic Linear Algebra Subprograms}
+  \end{block}
   \begin{itemize}
   \item Standard interface for standard operations:
     Matrix multiplication
-  \item Highly optimized for different platforms
+  \item Highly optimized for different platforms individually
   \end{itemize}
   \begin{block}{Some BLAS implementations}
     \begin{itemize}
@@ -293,13 +316,13 @@ vs
     \begin{itemize}
     \item \texttt{dgemm}: \alert double-precision \alert{ge}neral \alert matrix--\alert matrix multiply
     \item \texttt{dsymv}: \alert double-precision \alert{sy}mmetric \alert matrix--\alert vector multiply
-    \item \texttt{daxpy}: double-precision $\alert{a \mathbf X}\textrm{ \alert plus } \alert y$
+    \item \texttt{daxpy}: \alert double-precision $\alert{a \mathbf X}\textrm{ \alert plus } \alert y$
     \item \texttt{zsyr2k}: ``complex double-precision (\alert z) \alert{sy}mmetric \alert ran\alert{k-2} update'',
       $\mathbf X \mathbf Y^T + \mathbf Y \mathbf X^T$
     \item Etc.
     \end{itemize}
   \end{block}
-  \begin{block}{LAPACK, Linear Algebra PACKage}
+  \begin{block}{LAPACK: Linear Algebra PACKage}
     \begin{itemize}
     \item Higher-level linear algebra operations
     \item LU-decomposition, eigenvalues, \ldots
@@ -310,6 +333,13 @@ vs
   For best performance, use BLAS/LAPACK whenever possible
 \end{frame}
 
+\begin{frame}
+  \frametitle{Simple matrix multiplication vs BLAS}
+  \begin{figure}
+    \includegraphics[width=.95\textwidth]{code/timings-matmul-blas.pdf}
+  \end{figure}
+\end{frame}
+
 % Part 2: Parallelization
 %  * threading
 %  * MPI/distributed-memory
@@ -318,22 +348,27 @@ vs
 %  * Examples?  Redist-calculate-redist
 %  * ScaLAPACK
 
+\section*{Parallelization}
+\subsection*{}
+
+
 \begin{frame}
   \frametitle{Parallel programs}
   \begin{block}{Shared memory}
     \begin{itemize}
-    \item Different threads work at the same time, can have access to same variables
-    \item If one process reads while another process writes, bad things happen
+    \item Multiple threads work simulaneously, access same variables
+    \item Threads may read the same memory simultaneously, but
+      simultaneous writing leads to \alert{race condition}
     \item Threads must therefore \alert{synchronize} access to the memory
       (e.g.~\texttt{synchronized} methods and blocks in Java)
-    \item Lock, run, unlock
+    \item Synchronize means: ``Lock, run, unlock''
     \end{itemize}
   \end{block}
   \begin{block}{Distributed memory}
     \begin{itemize}
     \item Each process has its own chunk of memory, probably on different physical computers
     \item No problem with synchronizing memory (unless also threading)
-    \item Must manually send/receive all data
+    \item Must manually send/receive all data; much more difficult
     \end{itemize}
   \end{block}
 \end{frame}
@@ -372,6 +407,7 @@ vs
   \item \verb#MPI_COMM_WORLD# --- the communicator of all processes, from which one can create subcommunicators
   \item The \alert{size} of a communicator is how many processes participate
   \item Each process has a \alert{rank} within the communicator: 0, 1, 2, \ldots, size.
+  \item Run on 8 cores: \texttt{mpirun -np 8 myprogram}
   \end{itemize}
 \end{frame}
 
@@ -383,9 +419,49 @@ vs
 \begin{frame}[fragile]
   \begin{columns}
     \begin{column}{1.05\textwidth}
-  \lstinputlisting[basicstyle=\scriptsize\ttfamily]{mpi/mpihello2.c}
+  \lstinputlisting[firstline=4,basicstyle=\scriptsize\ttfamily]{mpi/mpihello2.c}
     \end{column}
   \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Supercomputers}
+  \begin{itemize}
+  \item ``Everyday'' supercomputers consist of many nodes, each with 4--32 cores, connected by a high-performance network
+  \item Threading can be used within a core, but most (electronic structure)
+    applications will use multiple cores with MPI
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{GPUs --- graphics cards for computing}
+  \begin{itemize}
+  \item A graphics card is a shared-memory processor running a very large number of threads
+  \item Graphics cards are cheap because computer games are popular
+  \item Graphics cards are the cheapest way of multiplying many floating point numbers
+  \item Special architecture: Code must be explicitly written for graphics cards
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{GPU performance}
+  \begin{itemize}
+  \item On a normal processor, each thread (a, b, c) should work on a contiguous piece of data (1, 2, 3):
+    \begin{table}
+    \begin{tabular}{|ccc|ccc|ccc|}
+      a1 &a2 &a3 &b1 &b2 &b3 &c1 &c2 &c3
+    \end{tabular}
+    \end{table}
+  \item On a graphics card, memory bandwidth (main memory to graphics card memory) is critical
+  \item Threads a, b, and c can start quickly only with a \alert{strided} memory layout:
+    \begin{table}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+      a1 &b1 &c1 &a2 &b2 &c2 &a3 &b3 &c3
+    \end{tabular}
+    \end{table}
+  \item Here, threads a, b, c will all run once we have received three chunks
+  \item In the previous case, b and c would still be idle after receiving three chunks
+  \end{itemize}
 \end{frame}
 
 % Part 3: Supercomputers
