@@ -427,11 +427,38 @@ a[i + 3] = b[i + 3] * c[i + 3];
 \begin{frame}
   \frametitle{Supercomputers}
   \begin{itemize}
-  \item ``Everyday'' supercomputers consist of many nodes, each with 4--32 cores, connected by a high-performance network
+  \item ``Everyday'' supercomputers (like Quinde here) consist of many nodes, each with typically 4--32 cores, connected by a high-performance network
   \item Threading can be used within a core, but most (electronic structure)
     applications will use multiple cores with MPI
+  \item Computers are typically accessed through a login node
+  \item Users submit jobs to queues
+  \item Computers may have GPUs
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Quinde supercomputer at Yachay}
+  \begin{itemize}
+  \item Soon to be fastest supercomputer in Ecuador
+  \item 84 compute nodes, dual Power-8 10-core CPUs (20 cores/node)
+  \item Dual K-80 graphics cards (NVidia), 8 tera-FLOPS
+  \item 128 GB memory per node
+  \item Interconnect: Mellanox 100 Gbit InfiniBand
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Massively parallel architectures}
+  \begin{itemize}
+  \item Hundreds of thousands of cores, very scalable
+  \item High demands on interconnect: Network topology, locality
+  \end{itemize}
+  \begin{figure}
+    \includegraphics[width=0.73\textwidth]{IBM_Blue_Gene_P_supercomputer.jpg}
+    \caption{IBM BlueGene/P (Image source: Wikipedia)}
+  \end{figure}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{GPUs --- graphics cards for computing}
@@ -483,6 +510,33 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \item \texttt{pdgemm}, \texttt{pdsyev}, \ldots
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Parallel scaling}
+  \begin{columns}
+    \begin{column}{0.67\textwidth}
+      \begin{itemize}
+      \item Parallel performance of GPAW/LCAO
+      \item Timing per SCF step
+      \item 2500--10000 atoms
+      \end{itemize}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \includegraphics[scale=0.85]{lcao-scaling-crop.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section*{Conclusions}
+\begin{frame}
+  \frametitle{Summary \& concluding remarks}
+  \begin{itemize}
+  \item Pipelining, memory locality
+  \item Parallelization: Threading, MPI
+  \item HPC libraries: BLAS, LAPACK, ScaLAPACK
+  \end{itemize}
+\end{frame}
+
 
 % Part 3: Supercomputers
 %  * Normal clusters
