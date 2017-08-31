@@ -464,6 +464,26 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{BLACS/ScaLAPACK}
+  \begin{itemize}
+  \item BLACS: Basic Linear Algebra Communication Subprograms
+  \item ScaLAPACK: Like LAPACK, but in parallel
+  \item ``2D block-cyclic memory layout'': Processes are arranged in a 2D grid, arrays are distributed in blocks
+  \item Distribution of blocks among ranks:
+    \begin{align}
+      \begin{array}{|c|c|c|c|c|c|}
+        \hline
+          0 & 1 & 2 & 0 & 1 & 2\\\hline
+          3 & 5 & 5 & 3 & 4 & 5\\\hline
+          0 & 1 & 2 & 0 & 1 & 2\\\hline
+          3 & 5 & 5 & 3 & 4 & 5\\\hline
+        \end{array}\nonumber
+    \end{align}
+  \item \texttt{pdgemm}, \texttt{pdsyev}, \ldots
+  \end{itemize}
+\end{frame}
+
 % Part 3: Supercomputers
 %  * Normal clusters
 %  * BlueGene/P
