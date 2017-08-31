@@ -425,7 +425,7 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \item \alert{Communicator}: Object which represents a group of processes that may communicate amongst themselves
   \item \verb#MPI_COMM_WORLD# --- the communicator of all processes
   \item The \alert{size} of a communicator is how many processes participate
-  \item Each process has a \alert{rank} within the communicator: 0, 1, 2, \ldots, size.
+  \item Each process has a \alert{rank} within the communicator: 0, 1, 2, \ldots, size - 1.
   \item Run on 8 cores: \texttt{mpirun -np 8 myprogram}
   \end{itemize}
 \end{frame}
