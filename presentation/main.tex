@@ -148,8 +148,7 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   Source: \url{http://www.7-cpu.com/cpu/Haswell.html}
   \bigskip
   \begin{itemize}
-  \item When accessing memory, contiguous chunks of memory will be copied into cache
-  \item Cached memory access is very efficient
+  \item When accessing memory, contiguous chunks of adjacent memory will be copied into cache
   \item A failed cache lookup is called a ``cache miss''
   \item Upon cache miss, element is looked up at next (slower) level
   \end{itemize}
@@ -193,17 +192,17 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   \item Work on contiguous chunks of memory
   \end{itemize}
 \begin{lstlisting}
+// fast
 for(i=0; i < I; i++) {
   for(j=0; j < J; j++) {
-    a[i * J + j] = ... // fast
+    a[i * J + j] = ...
   }
 }
-\end{lstlisting}
-vs
-\begin{lstlisting}
+
+// Slow
 for(j=0; j < J; j++) {
   for(i=0; i < I; i++) {
-    a[i * J + j] = ... // slow
+    a[i * J + j] = ...
   }
 }
 \end{lstlisting}
