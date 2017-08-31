@@ -420,10 +420,10 @@ a[i + 3] = b[i + 3] * c[i + 3];
 \begin{frame}[fragile]
   \frametitle{MPI --- Message Parsing Interface}
   \begin{itemize}
-  \item Specification for distributed-memory parallelization
+  \item Programming interface specification for distributed-memory parallelization
   \item Implementations: OpenMPI, MPICH, \ldots
   \item \alert{Communicator}: Object which represents a group of processes that may communicate amongst themselves
-  \item \verb#MPI_COMM_WORLD# --- the communicator of all processes, from which one can create subcommunicators
+  \item \verb#MPI_COMM_WORLD# --- the communicator of all processes
   \item The \alert{size} of a communicator is how many processes participate
   \item Each process has a \alert{rank} within the communicator: 0, 1, 2, \ldots, size.
   \item Run on 8 cores: \texttt{mpirun -np 8 myprogram}
