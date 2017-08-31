@@ -53,6 +53,25 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   \end{block}
 \end{frame}
 
+\begin{frame}
+  \begin{block}{HPC basics}
+  \begin{itemize}
+  \item Most time is probably spent with floating point operations
+  \item Important: Retrieve data from memory efficiently
+  \end{itemize}
+  \end{block}
+  \begin{block}{Some programming languages}
+    \begin{itemize}
+    \item (Assembly language)
+    \item Fortran (1957, 1977, 1995, 2003, \ldots)
+    \item C/C++
+    \item Python --- C extensions, Numpy, Scipy, \ldots
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\section*{Number crunching}
+\subsection*{Pipelining}
 
 \begin{frame}
   \frametitle{Floating point numbers}
@@ -75,17 +94,6 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   that execute floating point operations efficiently
 \end{frame}
 
-\section*{Number crunching}
-\subsection*{Pipelining}
-
-\begin{frame}
-  \frametitle{}
-  \begin{itemize}
-  \item Most time is probably spent with floating point operations
-  \item The actual floating point numbers are only part of the work
-  \item Important: Retrieve data from memory efficiently
-  \end{itemize}
-\end{frame}
 
 \begin{frame}
   \frametitle{Pipelining}
@@ -161,7 +169,7 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
     2,1 & 2,2 & 2,3 \\
     3,1 & 3,2 & 3,3
   \end{matrix}
-  \right]
+  \right]\nonumber
   \end{align}
 \item Elements of the array are stored in a \alert{contiguous} chunk of memory,
   but the ordering depends on language
@@ -274,12 +282,12 @@ a[i + 3] = b[i + 3] * c[i + 3];
         \mathbf A_{11} &\cdots& \mathbf A_{1n}\\
         \vdots & & \vdots \\
         \mathbf A_{n1} & \cdots & \mathbf A_{nn}
-      \end{matrix}\right]
+      \end{matrix}\right]\nonumber
   \end{align}
 
 \item Matrix product expressed with blocks:
   \begin{align}
-    \mathbf C_{ij} = \sum_{k} \mathbf A_{ik} \mathbf B_{kj}
+    \mathbf C_{ij} = \sum_{k} \mathbf A_{ik} \mathbf B_{kj}\nonumber
   \end{align}
   \item Work on smaller blocks that fit into cache
   \item Optimal blocksize depends on architecture (e.g.\ cache size)
@@ -349,11 +357,11 @@ a[i + 3] = b[i + 3] * c[i + 3];
 %  * ScaLAPACK
 
 \section*{Parallelization}
-\subsection*{}
+\subsection*{Parallel programs}
 
 
 \begin{frame}
-  \frametitle{Parallel programs}
+  %\frametitle{Parallel programs}
   \begin{block}{Shared memory}
     \begin{itemize}
     \item Multiple threads work simulaneously, access same variables
@@ -374,7 +382,7 @@ a[i + 3] = b[i + 3] * c[i + 3];
 \end{frame}
 
 \begin{frame}
-  \frametitle{Parallel deadlocks}
+  \frametitle{Deadlocks}
   \begin{block}{Example}
   \begin{itemize}
   \item Resource A is blocked by process N
@@ -397,6 +405,8 @@ a[i + 3] = b[i + 3] * c[i + 3];
     \end{itemize}
   \end{block}
 \end{frame}
+
+\subsection*{Parallel programming}
 
 \begin{frame}[fragile]
   \frametitle{MPI --- Message Parsing Interface}
@@ -424,27 +434,32 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \end{columns}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Supercomputers}
-  \begin{itemize}
-  \item ``Everyday'' supercomputers (like Quinde here) consist of many nodes, each with typically 4--32 cores, connected by a high-performance network
-  \item Threading can be used within a core, but most (electronic structure)
-    applications will use multiple cores with MPI
-  \item Computers are typically accessed through a login node
-  \item Users submit jobs to queues
-  \item Computers may have GPUs
-  \end{itemize}
-\end{frame}
+\subsection*{Supercomputing}
+
+%\begin{frame}
+%  \frametitle{Supercomputers}
+%  \begin{itemize}
+%  \item ``Everyday'' supercomputers (like Quinde here) consist of many nodes, each with typically 4--32 cores, connected by a high-performance network
+%  \item Threading can be used within a core, but most (electronic structure)
+%    applications will use multiple cores with MPI
+%  \item Computers are typically accessed through a login node
+%  \item Users submit jobs to queues
+%  \item Computers may have GPUs
+%  \end{itemize}
+%\end{frame}
 
 \begin{frame}
   \frametitle{Quinde supercomputer at Yachay}
   \begin{itemize}
-  \item Soon to be fastest supercomputer in Ecuador
   \item 84 compute nodes, dual Power-8 10-core CPUs (20 cores/node)
   \item Dual K-80 graphics cards (NVidia), 8 tera-FLOPS
   \item 128 GB memory per node
   \item Interconnect: Mellanox 100 Gbit InfiniBand
   \end{itemize}
+  \vspace{-5mm}
+  \begin{figure}
+  \includegraphics[width=0.7\textwidth]{quinde.jpg}
+  \end{figure}
 \end{frame}
 
 \begin{frame}
@@ -464,7 +479,6 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \frametitle{GPUs --- graphics cards for computing}
   \begin{itemize}
   \item A graphics card is a shared-memory processor running a very large number of threads
-  \item Graphics cards are cheap because computer games are popular
   \item Graphics cards are the cheapest way of multiplying many floating point numbers
   \item Special architecture: Code must be explicitly written for graphics cards
     \end{itemize}
