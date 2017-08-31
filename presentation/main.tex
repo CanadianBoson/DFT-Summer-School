@@ -9,7 +9,8 @@
   basicstyle=\small\ttfamily,
   keywordstyle=\color{red},
   identifierstyle=\color{Blue},
-  stringstyle=\color{yellow},
+  stringstyle=\color{Green},
+  commentstyle=\ttfamily\color{RoyalPurple},
   showstringspaces=false,
   language=C}%,
 
@@ -323,7 +324,8 @@ vs
     \begin{itemize}
     \item Different threads work at the same time, can have access to same variables
     \item If one process reads while another process writes, bad things happen
-    \item Threads must therefore synchronize access to the memory
+    \item Threads must therefore \alert{synchronize} access to the memory
+      (e.g.~\texttt{synchronized} methods and blocks in Java)
     \item Lock, run, unlock
     \end{itemize}
   \end{block}
@@ -338,6 +340,7 @@ vs
 
 \begin{frame}
   \frametitle{Parallel deadlocks}
+  \begin{block}{Example}
   \begin{itemize}
   \item Resource A is blocked by process N
   \item Process N waits for resource B
@@ -348,6 +351,37 @@ vs
   %\item Process A holds resource X, waits for resource Y
   %\item Process B holds resource Y, waits for resource X
   \end{itemize}
+  \end{block}
+
+  \begin{block}{Example: Distributed memory}
+    \begin{itemize}
+    \item Process 1 sends 5 numbers to process 2
+    \item Process 1 expects something from process 2
+    \item Process 2 expects 6 numbers from process 1, receives 5
+    \item Both processes wait forever
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{MPI --- Message Parsing Interface}
+  \begin{itemize}
+  \item Specification for distributed-memory parallelization
+  \item Implementations: OpenMPI, MPICH, \ldots
+  \item \alert{Communicator}: Object which represents a group of processes that may communicate amongst themselves
+  \item \verb#MPI_COMM_WORLD# --- the communicator of all processes, from which one can create subcommunicators
+  \item The \alert{size} of a communicator is how many processes participate
+  \item Each process has a \alert{rank} within the communicator: 0, 1, 2, \ldots, size.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Parallel hello world}
+  \lstinputlisting[basicstyle=\scriptsize\ttfamily]{mpi/mpihello.c}
+\end{frame}
+
+\begin{frame}[fragile]
+  \lstinputlisting[basicstyle=\scriptsize\ttfamily]{mpi/mpihello2.c}
 \end{frame}
 
 % Part 3: Supercomputers
@@ -366,22 +400,6 @@ vs
 % Pointers
 % etc.
 
-% CPU layout
-%   FPU, pipelining
-%   Caching
-
-% Memory locality and caching
-\begin{frame}
-  \frametitle{Caching}
-  \begin{itemize}
-  \item CPU register
-  \item L1 cache (very fast)
-  \item L2 cache (fast)
-  \item Main memory (slow)
-  \end{itemize}
-\end{frame}
-
-% Pipelining
 
 % Matrix multiplication example
 
