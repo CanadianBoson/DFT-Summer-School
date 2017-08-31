@@ -5,4 +5,4 @@ unroll: matmul_unroll.c
 	gcc matmul_unroll.c -o matmul_unroll -Wall -O3 -funroll-loops
 
 clean:
-	rm -f matmul matmul_unroll
+	rm -f matmul
