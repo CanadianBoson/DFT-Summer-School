@@ -249,6 +249,8 @@ Different permutations of $\{ikj\}$ loops will perform differently
 %  * matmul
 %  * BLAS
 
+\subsection*{More optimizations}
+
 \begin{frame}[fragile]
 \frametitle{Loop unrolling}
 \begin{itemize}
@@ -433,6 +435,47 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \end{columns}
 \end{frame}
 
+
+\begin{frame}
+  \frametitle{BLACS/ScaLAPACK}
+  \begin{itemize}
+  \item BLACS: Basic Linear Algebra Communication Subprograms
+  \item ScaLAPACK: Like LAPACK, but in parallel
+  \item BLACS uses ``2D block-cyclic memory layout'': Processes are arranged in a 2D grid, arrays are distributed in blocks
+  \item Distribution of blocks among ranks:
+    \begin{align}
+      \begin{array}{|c|c|c|c|c|c|}
+        \hline
+          0 & 1 & 2 & 0 & 1 & 2\\\hline
+          3 & 5 & 5 & 3 & 4 & 5\\\hline
+          0 & 1 & 2 & 0 & 1 & 2\\\hline
+          3 & 5 & 5 & 3 & 4 & 5\\\hline
+        \end{array}\nonumber
+    \end{align}
+  \item \texttt{pdgemm}, \texttt{pdsyev}, \ldots
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel scaling}
+  \begin{columns}
+    \begin{column}{0.67\textwidth}
+        \begin{block}{GPAW/LCAO performance}
+      \begin{itemize}
+      \item Time per iteration, 2500--10k atoms
+      \item ``Strong-scaling'' test: Fixed problem size, increase CPU count
+      \item More processes increase speed, but also overhead
+      \item More processes may be necessary when calculation does not fit into memory
+      \end{itemize}
+        \end{block}
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \includegraphics[scale=0.85]{lcao-scaling-crop.pdf}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+
 \subsection*{Supercomputing}
 
 %\begin{frame}
@@ -451,7 +494,7 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \frametitle{Quinde supercomputer at Yachay}
   \begin{itemize}
   \item 84 compute nodes, dual Power-8 10-core CPUs (20 cores/node)
-  \item Dual K-80 graphics cards (NVidia), 8 tera-FLOPS
+  \item Dual NVidia K-80 graphics cards, 8 tera-FLOPS
   \item 128 GB memory per node
   \item Interconnect: Mellanox 100 Gbit InfiniBand
   \end{itemize}
@@ -488,15 +531,15 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \begin{itemize}
   \item On a normal processor, each thread (a, b, c) should work on a contiguous piece of data (1, 2, 3):
     \begin{table}
-    \begin{tabular}{|ccc|ccc|ccc|}
-      a1 &a2 &a3 &b1 &b2 &b3 &c1 &c2 &c3
+    \begin{tabular}{|ccc|ccc|ccc|}\hline
+      a1 &a2 &a3 &b1 &b2 &b3 &c1 &c2 &c3\\\hline
     \end{tabular}
     \end{table}
   \item On a graphics card, memory bandwidth (main memory to graphics card memory) is critical
   \item Threads a, b, and c can start quickly only with a \alert{strided} memory layout:
     \begin{table}
-    \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-      a1 &b1 &c1 &a2 &b2 &c2 &a3 &b3 &c3
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|}\hline
+      a1 &b1 &c1 &a2 &b2 &c2 &a3 &b3 &c3\\\hline
     \end{tabular}
     \end{table}
   \item Here, threads a, b, c will all run once we have received three chunks
@@ -504,43 +547,8 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{BLACS/ScaLAPACK}
-  \begin{itemize}
-  \item BLACS: Basic Linear Algebra Communication Subprograms
-  \item ScaLAPACK: Like LAPACK, but in parallel
-  \item ``2D block-cyclic memory layout'': Processes are arranged in a 2D grid, arrays are distributed in blocks
-  \item Distribution of blocks among ranks:
-    \begin{align}
-      \begin{array}{|c|c|c|c|c|c|}
-        \hline
-          0 & 1 & 2 & 0 & 1 & 2\\\hline
-          3 & 5 & 5 & 3 & 4 & 5\\\hline
-          0 & 1 & 2 & 0 & 1 & 2\\\hline
-          3 & 5 & 5 & 3 & 4 & 5\\\hline
-        \end{array}\nonumber
-    \end{align}
-  \item \texttt{pdgemm}, \texttt{pdsyev}, \ldots
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Parallel scaling}
-  \begin{columns}
-    \begin{column}{0.67\textwidth}
-      \begin{itemize}
-      \item Parallel performance of GPAW/LCAO
-      \item Timing per SCF step
-      \item 2500--10000 atoms
-      \end{itemize}
-    \end{column}
-    \begin{column}{.4\textwidth}
-      \includegraphics[scale=0.85]{lcao-scaling-crop.pdf}
-    \end{column}
-  \end{columns}
-\end{frame}
-
 \section*{Conclusions}
+\subsection*{}
 \begin{frame}
   \frametitle{Summary \& concluding remarks}
   \begin{itemize}
