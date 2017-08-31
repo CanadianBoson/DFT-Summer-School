@@ -37,7 +37,7 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
   \begin{block}{The CPU}
     \begin{itemize}
     \item The CPU reads \alert{instructions and inputs}, then performs those instructions on the inputs
-    \item Instruction codes and inputs are stored in workspaces
+    \item Instruction codes and inputs are processed in workspaces
       on the CPU called \alert{registers}
     \item Each cycle, the CPU can execute an instruction; different
       CPU architectures support different instructions
@@ -383,27 +383,35 @@ a[i + 3] = b[i + 3] * c[i + 3];
 \end{frame}
 
 \begin{frame}
-  \frametitle{Deadlocks}
-  \begin{block}{Example}
-  \begin{itemize}
-  \item Resource A is blocked by process N
-  \item Process N waits for resource B
-  \item Resource B is blocked by process M
-  \item Process M waits for resource A
+  \frametitle{Parallel pitfalls and deadlocks}
+  \begin{block}{Example 1}
+    \begin{itemize}
+    \item Process 1 sends 5 numbers to process 2
+    \item Process 1 expects something from process 2
+    \item Process 2 expects 6 numbers from process 1, receives 5
+    \item Both processes now wait forever
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Parallel pitfalls and deadlocks}
+  \begin{block}{Example 2}
+    \begin{itemize}
+    \item Process A reserves Sala Capitular for this talk
+    \item Process B attempts to reserve Sala Capitular for this talk,
+      but Sala Caputular is already reserved for some talk
+    \item Process B schedules this talk for another lecture room
+    \item \ldots
+  %\item Resource A is blocked by process N
+  %\item Process N waits for resource B
+  %\item Resource B is blocked by process M
+  %\item Process M waits for resource A
   %\item Process A expects 10 bytes from process B
   %\item Process B sends only 5 bytes
   %\item Process A holds resource X, waits for resource Y
   %\item Process B holds resource Y, waits for resource X
   \end{itemize}
-  \end{block}
-
-  \begin{block}{Example: Distributed memory}
-    \begin{itemize}
-    \item Process 1 sends 5 numbers to process 2
-    \item Process 1 expects something from process 2
-    \item Process 2 expects 6 numbers from process 1, receives 5
-    \item Both processes wait forever
-    \end{itemize}
   \end{block}
 \end{frame}
 
