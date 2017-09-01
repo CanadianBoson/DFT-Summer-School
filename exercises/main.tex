@@ -53,9 +53,10 @@ equations for a harmonic oscillator including electronic kinetic
 energy, electrostatic repulsion between the electrons, and the
 local density approximation for electronic interactions, ignoring correlation.
 
-This gives us the full Hamiltonian
+This gives us the full Hamiltonian including the potential $v(x)$
+which we write as
 \begin{align}
-\hat H = -\frac12 \diff{^2}{x^2} + v_\Ha(x) + v_{\mathrm X}^{\mathrm{LDA}}(x) + x^2.
+\hat H = -\frac12 \diff{^2}{x^2} + v(x) = -\frac12 \diff{^2}{x^2} + v_\Ha(x) + v_{\mathrm X}^{\mathrm{LDA}}(x) + x^2.
 \end{align}
 Overview: We must be able to calculate the KS wavefunctions, the
 density, and each of the potentials required to represent the
@@ -68,7 +69,8 @@ by the Python interpreter.
 There are two main versions:
 \texttt{python2} (also called just \texttt{python}) and \texttt{python3}.
 Either is fine, but we use \texttt{python3}.
-Run the interactive Python interpreter:
+Open a terminal and
+run the interactive Python interpreter:
 
 \begin{verbatim}
 askhl@hagen:~$ python3
@@ -93,7 +95,7 @@ Note that the scope of the \texttt{for} loop is controlled by indentation.
 The loop ends once the code is no longer indented.
 It is conventional to indent by 4 spaces in Python.
 
-Alternatively we can write code within a text editor:
+Alternatively we can a script, opening our favourite text editor (gedit is the standard one in Ubuntu) and typing:
 \begin{lstlisting}
 print('hello world!')
 \end{lstlisting}
@@ -120,7 +122,7 @@ The function is then represented by the vector of values $\{f(x_i)\}$.
 
 \exercise{
 How do you approximate the first and second derivatives of a function from
-its representation $\{f(x_i)\}$ on the grid?  Verify using matplotlib that your
+its representation $\{f(x_i)\}$ on the grid?  Calculate and verify using matplotlib that your
 numerical derivatives are correct.
 }
 
@@ -230,7 +232,7 @@ as the derivative of the energy with respect to the density.
 The \emph{exchange potential} is therefore given by the derivative
 of the exchange energy with respect to the density:
 \begin{align}
-  v_{\X}^\LDA(x) = \pdiff{E_\X^\LDA[n]}{n(x)} = \left(\frac3 \pi\right)^{1/3}
+  v_{\X}^\LDA(x) = \pdiff{E_\X^\LDA[n]}{n(x)} = -\left(\frac3 \pi\right)^{1/3}
   n^{1/3}(x)
 \end{align}
 
@@ -302,8 +304,9 @@ density does not change anymore, the calculated quantities are
 The kinetic energy is
 \begin{align}
   T = \int \psi^*(x)\left(-\frac12 \diff{}{x^2}\right) \psi(x) \idee x
-  = \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x.
+  = \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x,
 \end{align}
+where $v(x) = v_\Ha(x) + v_\X + x^2$ is the total potential.
 
 \exercise{
 Calculate the kinetic energy and each of the other energy contributions to get the final total energy:
