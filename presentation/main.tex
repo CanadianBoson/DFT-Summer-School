@@ -418,7 +418,7 @@ a[i + 3] = b[i + 3] * c[i + 3];
 \subsection*{Parallel programming}
 
 \begin{frame}[fragile]
-  \frametitle{MPI --- Message Parsing Interface}
+  \frametitle{MPI --- Message Passing Interface}
   \begin{itemize}
   \item Programming interface specification for distributed-memory parallelization
   \item Implementations: OpenMPI, MPICH, \ldots
@@ -455,9 +455,9 @@ a[i + 3] = b[i + 3] * c[i + 3];
       \begin{array}{|c|c|c|c|c|c|}
         \hline
           0 & 1 & 2 & 0 & 1 & 2\\\hline
-          3 & 5 & 5 & 3 & 4 & 5\\\hline
+          3 & 4 & 5 & 3 & 4 & 5\\\hline
           0 & 1 & 2 & 0 & 1 & 2\\\hline
-          3 & 5 & 5 & 3 & 4 & 5\\\hline
+          3 & 4 & 5 & 3 & 4 & 5\\\hline
         \end{array}\nonumber
     \end{align}
   \item \texttt{pdgemm}, \texttt{pdsyev}, \ldots
