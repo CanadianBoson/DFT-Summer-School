@@ -116,14 +116,7 @@ The function is then represented by the vector of values $\{f(x_i)\}$.
 
 \noindent We can use matplotlib to plot $\sin(x)$ on a suitable grid:
 
-\begin{lstlisting}
-import numpy as np
-import matplotlib.pyplot as plt
-x = np.linspace(-5, 5, 200)  # define grid
-y = np.sin(x)
-plt.plot(x, y)
-plt.show()
-\end{lstlisting}
+\lstinputlisting{script/basicplot.py}
 
 \exercise{
 How do you approximate the first and second derivatives of a function from
@@ -132,19 +125,7 @@ numerical derivatives are correct.
 }
 
 \noindent Numpy array examples:
-\begin{lstlisting}
-array = np.zeros(10)  # new array with 10 zeros
-array[3] = 5  # Assign to an element
-array[5:8] += 2  # In-place add to several elements
-print(array[5])  # Print an element
-array2 = 2 * array  # Multiply by 2, creating new array
-array *= 2  # Multiply all elements in-place
-
-array2D = np.random.rand(4, 8)  # 4 x 8 random numbers
-print(array2D[:, 0])  # Print first row
-print(array2D[:, 7])  # Print last row
-print(array2D[0, :])  # Print first column
-\end{lstlisting}
+\lstinputlisting{script/numpyexamples.py}
 
 \section{Free non-interacting electrons}
 
@@ -180,7 +161,8 @@ Above, we use \lstinline{_n} as a hint that the array has an element for each
 state,
 and \lstinline{_gn} means a 2D array indexed first by grid point, then state.
 This tends to improve readability of code with many arrays.
-Thus, \lstinline{psi_gn[:, 0]} is the whole state vector of the first state.
+Thus, \lstinline{psi_gn[:, 0]} is the whole state vector of the first state,
+and \lstinline{psi_gn[:, :5]} is a 2D matrix including only the first five.
 
 \exercise{
   Choose a grid and calculate the free-particle energies and wavefunctions.
@@ -306,7 +288,7 @@ The self-consistency loop repeats the following steps:
 
 
 \exercise{
-  Implement the self-consistency loop and iterate enough to converge
+  Implement the self-consistency loop and iterate enough times to converge
   and plot the density.
 }
 
