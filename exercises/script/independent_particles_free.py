@@ -18,8 +18,7 @@ for i in range(Ng):
         T_gg[i - 1, i] = 1.0
 T_gg *= -0.5 / dx**2
 
-H_gg = T_gg + np.diag(vext_g)  # Hamiltonian
-eps_n, psi_gn = np.linalg.eigh(H_gg)
+eps_n, psi_gn = np.linalg.eigh(T_gg)
 
 print(eps_n[:Nn])
 
