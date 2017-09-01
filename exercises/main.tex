@@ -12,6 +12,7 @@
   keywordstyle=\color{red},
   identifierstyle=\color{Blue},
   stringstyle=\color{OliveGreen},
+  commentstyle=\ttfamily\color{Green},
   showstringspaces=false,
   language=Python}%,
 %  basicstyle=\small\texttt}
@@ -88,6 +89,9 @@ hello world!
 hello
 >>>
 \end{verbatim}
+Note that the scope of the \texttt{for} loop is controlled by indentation.
+The loop ends once the code is no longer indented.
+It is conventional to indent by 4 spaces in Python.
 
 Alternatively we can write code within a text editor:
 \begin{lstlisting}
@@ -96,20 +100,21 @@ print('hello world!')
 Then save the script as \texttt{hello.py} and run it with
 \texttt{python3 hello.py}.
 
-Although we always want to write \emph{scripts},
-the interactive interpreter is an excellent tool to play around and test
+We always want to write \emph{scripts},
+but the interactive interpreter is an excellent tool to play around and test
 things before adding them to the script.
 
 Use \lstinline{help(obj)} to see the documentation for any object
 (including functions and modules).
 
 \section{Grids}
-The simplest possible way to represent a real function $f(x)$,
+The simplest way to represent a real function $f(x)$,
 with $a \le x \le b$, is to
-sample it on a uniform real-space grid of points $\{x_i\}$ from $a$ to $b$.
+sample it on a real-space grid of points $\{x_i\}$ from $a$ to $b$ with some
+uniform spacing $h$.
 The function is then represented by the vector of values $\{f(x_i)\}$.
 
-Use matplotlib to plot $\sin(x)$ on a suitable grid:
+\noindent We can use matplotlib to plot $\sin(x)$ on a suitable grid:
 
 \begin{lstlisting}
 import numpy as np
@@ -126,18 +131,7 @@ its representation $\{f(x_i)\}$ on the grid?  Verify using matplotlib that your
 numerical derivatives are correct.
 }
 
-Useful hints:
-
-\begin{itemize}
-\item Run \texttt{python3} to start the interactive inter
-\item Get help about a function: \texttt{help(np.linspace)}
-\item Import Numpy: \texttt{import numpy as np}
-\item Make a uniform grid: \texttt{np.linspace}
-\item Import Matplotlib: \texttt{import matplotlib.pyplot as plt}
-\item Plot something: \texttt{plt.plot}
-\end{itemize}
-
-Numpy array examples:
+\noindent Numpy array examples:
 \begin{lstlisting}
 array = np.zeros(10)  # new array with 10 zeros
 array[3] = 5  # Assign to an element
@@ -165,8 +159,8 @@ applied to a state $\psi(x)$ by left-multiplying it onto the state:
 \texttt{Opsi = np.dot(O, psi)}.
 
 \exercise{
-How can we represent the action of the kinetic operator (which
-includes a second derivative) as a matrix?  Use the expression
+How can we represent the kinetic operator ($-1/2$ times the second derivative)
+as a matrix?  Use the expression
 for the second derivative derived earlier.
 }
 
@@ -182,20 +176,11 @@ eigenvalues of that matrix.  The matrix is real and symmetric, so both eigenvalu
 \begin{lstlisting}
 epsilon_n, psit_gn = np.linalg.eigh(T)
 \end{lstlisting}
-Above, we use \lstinline{_n} as a hint that the array is indexed by state,
-and \lstinline{_gn} means a 2D array indexed first by grid index, then state.
-
-Numpy arrays can be used with arithmetic operators (\texttt +, \texttt -,
-\texttt *, \ldots) in combination with numbers and other arrays.
-
-You can 
-\begin{lstinline}
-array = np.zeros(50)
-for g in range(50):
-    array[g] = g**2
-\end{lstinline}
-\texttt{psi[g, n]}.  To get a particular function as a whole vector, use
-\texttt{psi[:, n]}.
+Above, we use \lstinline{_n} as a hint that the array has an element for each
+state,
+and \lstinline{_gn} means a 2D array indexed first by grid point, then state.
+This tends to improve readability of code with many arrays.
+Thus, \lstinline{psi_gn[:, 0]} is the whole state vector of the first state.
 
 \exercise{
   Choose a grid and calculate the free-particle energies and wavefunctions.
@@ -219,15 +204,17 @@ making sure that your grid is adequate.
 
 \section{Density}
 Next we need to calculate the electron density.
-
 Each state should be normalized so it integrates to one (having the
 capacity to contain one electron):
 \begin{align}
   \int |\psi(x)|^2 \idee x = 1.
 \end{align}
 The normalization from \texttt{np.linalg.eigh} will be different.
+
+\exercise{
 How do you calculate an integral over the grid?
-Make sure all the states integrate to 1.
+Normalize the states so they integrate to 1.
+}
 
 Then the electron density in DFT is given by
 \begin{align}
@@ -236,41 +223,54 @@ Then the electron density in DFT is given by
 where $f_n$ are the \emph{occupation numbers}.
 
 The electrons will
-preferentially occupy those available states with lowest energy.  Each
-state fits two electrons (one with spin up, and one with spin down), so
-a state can in general be occupied by 0, 1, or 2 electrons.
+occupy the states with lowest energy.  Each
+state fits up to two electrons: one with spin up, and one with spin down.
+A state can therfore be occupied by 0, 1, or 2 electrons.
 
 Let us say that we have 6 electrons.  Then the three lowest states
 will have occupation number $f=2$ and all others $f=0$.
 
-Plot the electron density for 6 electrons in the harmonic potential.
+\exercise{
+Calculate and plot the electron density for 6 electrons in the harmonic potential.
 Verify that the density integrates to 6 electrons.
+}
 
 \section{Exchange energy}
-The exchange (and correlation) energy is a correction to the
+The exchange (and correlation) functional is a correction to the
 electronic energy that approximates the effect of electron interactions.
-We consider here only the exchange which is particularly simple in LDA,
-the local density approximation:
+To keep life simple, we consider only the exchange functional in the local density approximation (LDA) which is
 \begin{align}
   E_\X^\LDA[n] = -\frac 34 \left(\frac 3 \pi\right)^{1/3} \int n^{4/3} \idee x
 \end{align}
-In the derivation of the Kohn--Sham equations, the potential is defined
-as the derivative of the total energy with respect to the density.
-The exchange \emph{potential} is therefore given by the derivative
+In the derivation of the Kohn--Sham equations, the potential
+corresponding to each energy term is defined
+as the derivative of the energy with respect to the density.
+The \emph{exchange potential} is therefore given by the derivative
 of the exchange energy with respect to the density:
 \begin{align}
   v_{\X}^\LDA(x) = \pdiff{E_\X^\LDA[n]}{n(x)} = \left(\frac3 \pi\right)^{1/3}
-  n(x)
+  n^{1/3}(x)
 \end{align}
-Calculate the exchange potential and energy from the previously
-calculated density.
 
-Write a function which, given a density, returns the exchange energy and potential.
+\exercise{Calculate the exchange potential and energy from the previously
+calculated density.}
 
+It is useful to define a function to do this calculation:
+\begin{lstlisting}
+def calculate_exchange(density):
+    energy = ...  # Calculate
+    potential = ...  # Calculate
+    return energy, potential
+
+mydensity = np.random.rand(10)
+energy, potential = calculate_exchange(mydensity)
+\end{lstlisting}
+
+\exercise{Write the calculation of exchange as a function.}
 
 \section{Coulomb potential}
-(Optionally you may skip ahead to the next exercise and implement the
-self-consistency loop if short of time)
+(If short of time, consider skipping this exercise for now and implement the
+self-consistency loop first, ignoring the Coulomb potential)
 
 The electrostatic energy or Hartree energy is given by
 \begin{align}
@@ -279,8 +279,8 @@ The electrostatic energy or Hartree energy is given by
 This expression converges in 3D, but not in 1D.  Hence we cheat and use
 a modified, ``softened'' form:
 \begin{align}
-E_{\mathrm{Ha}} = \frac12 \iint \frac{n(x) n(x')}{\sqrt{(x - x')^2 + 1}}.
-\idee x \idee x'
+E_{\mathrm{Ha}} = \frac12 \iint \frac{n(x) n(x')}{\sqrt{(x - x')^2 + 1}}
+\idee x \idee x'.
 \end{align}
 Again, the potential is the derivative of the energy with respect to the
 density:
@@ -289,11 +289,11 @@ density:
   \int \frac{n(x)}{\sqrt{(x - x')^2 + 1}} \idee x
 \end{align}
 
-Calculate the Coulomb energy of the previous density and plot the
-Coulomb potential.
+\exercise{Write a function to calculate the Coulomb energy and potential,
+  then plot the potential for the previous density.}
 
 \section{Self-consistency loop}
-Write a loop which repeats calculating:
+The self-consistency loop repeats the following steps:
 \begin{itemize}
 \item Exchange energy and potential from the density (you can start with a
   constant density, e.g. 0)
@@ -303,24 +303,35 @@ Write a loop which repeats calculating:
 \item Wavefunctions and their energies from the Hamiltonian
 \item Density from the normalized wavefunctions and occupations
 \end{itemize}
-Iterate as many times as it takes to converge the density.  When the
+
+
+\exercise{
+  Implement the self-consistency loop and iterate enough to converge
+  and plot the density.
+}
+
+\noindent You may wish to print interesting quantities like the energy
+contributions from within the self-consistency loop.
+When the
 density does not change anymore, the calculated quantities are
-\emph{self-consistent}.
+\emph{self-consistent}, and the calculation is done.
 
 \section{Total energy}
-The kinetic energy is:
+The kinetic energy is
 \begin{align}
-  \int \psi^*(x)\left(-\frac12 \diff{}{x^2}\right) \psi(x) \idee x
+  T = \int \psi^*(x)\left(-\frac12 \diff{}{x^2}\right) \psi(x) \idee x
+  = \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x.
 \end{align}
-which can be conveniently rewritten as
-\begin{align}
-  \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x.
-\end{align}
+
+\exercise{
 Calculate the kinetic energy and each of the other energy contributions to get the final total energy:
 \begin{align}
-  E = \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x
-  + E_\Ha[n] + E_\X[n] + \int n(x) v_{\mathrm{exc}}(x) \idee x.
+  E &= \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x \nonumber\\
+  &\quad+ E_\Ha[n] + E_\X[n] + \int n(x) v_{\mathrm{exc}}(x) \idee x.
 \end{align}
+}
+
+\section{The end}
 
 The DFT code is now complete!  If you want, you can wrap it all in a
 single function whose parameters are the grid, the external potential,
