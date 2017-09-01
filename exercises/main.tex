@@ -15,9 +15,14 @@
   language=Python}%,
 %  basicstyle=\small\texttt}
 
-\newcommand{\diff}[2]{\frac{\mathrm d #1}{\mathrm d #2}}
+\newcommand{\dee}[0]{\mathrm d}
+\newcommand{\idee}[0]{\,\dee}
+\newcommand{\diff}[2]{\frac{\dee #1}{\dee #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\Ha}[0]{\mathrm{Hartree}}
 \newcommand{\XC}[0]{\mathrm{XC}}
+\newcommand{\X}[0]{\mathrm{X}}
+\newcommand{\LDA}[0]{\mathrm{LDA}}
 \newcommand{\ext}[0]{\mathrm{ext}}
 
 \title{Python for scientific scripting --- }
@@ -42,23 +47,20 @@ This gives us the full Hamiltonian
 \begin{align}
 \hat H = -\frac12 \diff{^2}{x^2} + v_\Ha(x) + v_{\mathrm X}^{\mathrm{LDA}}(x) + x^2.
 \end{align}
-
 Overview: We must be able to calculate the KS wavefunctions, the
 density, and each of the potentials required to represent the
 Hamiltonian.  We must also represent the Hamiltonian somehow,
 including the kinetic operator.  But one thing at a time.
 
 \section{Python}
-
 Python is a dynamically typed language.  Python programs are executed
 by the Python interpreter.
-
 There are two main versions:
 \texttt{python2} (also called just \texttt{python}) and \texttt{python3}.
 Either is fine, but we use \texttt{python3}.
 Run the interactive Python interpreter:
 
-\begin{lstlisting}
+\begin{verbatim}
 askhl@hagen:~$ python3
 Python 3.5.2 (default, Nov 17 2016, 17:05:23)
 [GCC 5.4.0 20160609] on linux
@@ -76,32 +78,32 @@ hello world!
 3
 hello
 >>>
-\end{lstlisting}
+\end{verbatim}
 
-Alternatively we can write code into a script:
+Alternatively we can write code in a text editor:
 \begin{lstlisting}
 print('hello world!')
 \end{lstlisting}
-and save the script as \texttt{hello.py}.  Then we run the script using
+Then save the script as \texttt{hello.py}.  Then we can run the script using
 \texttt{python3 hello.py}.
 
-Although what you want to write is a script, be sure to use
-the interactive interpreter to test things and play
-around, so you know that the code does what you think it does.
+Although you want to write a script, be sure to use
+the interactive interpreter to play around and test things ---
+then you know for sure that the code does what you think it does.
 
 Use \lstinline{help(obj)} to see the documentation for any object
 (including functions and modules).
 
 \section{Grids}
-
 The simplest possible way to represent a real function $f(x)$,
 with $a \le x \le b$, is to
 sample it on a uniform real-space grid of points $\{x_i\}$ from $a$ to $b$.
 The function is then represented by the values $\{f(x_i)\}$.
 
-Use matplotlib to plot $\sin(x)$ on a suitable grid; see below.
-How do you calculate the first and second derivatives of a function from
-its grid representation?  Verify using matplotlib.
+Use matplotlib to plot $\sin(x)$ on a suitable grid; see below.  How
+do you approximate the first and second derivatives of a function from
+its grid representation?  Verify using matplotlib that your
+derivatives are correct.
 
 Useful functions:
 
@@ -122,30 +124,114 @@ plt.show()
 \item \texttt{import numpy as np}
 \item \texttt{np.linspace} and other NumPy functions
 \item \texttt{import matplotlib.pyplot as plt}
-\item \texttt{plt.plot} 
+\item \texttt{plt.plot}
 \end{itemize}
 
 \section{Free non-interacting electrons}
 
 To get the Kohn--Sham wavefunctions we must diagonalize the
 Hamiltonian, i.e., calculate its eigenvectors.  Hence we need a matrix
-representation of the Hamiltonian.
+representation of the Hamiltonian.  We start with the kinetic operator
+$\hat T$.
 
-If our grid has $N$ points, then all possible linear operators are
-those represented by $N\times N$ matrices.  An operator $O$ is applied
-to a state $psi(x)$ by left-multiplying it onto the state,
-\texttt{Opsi = np.dot(O, psi)}.  How can we represent the kinetic
-operator as a matrix?
+If our grid has $N$ points, then all possible linear operators on that
+space are represented by $N\times N$ matrices.  An operator $O$ is
+applied to a state $\psi(x)$ by left-multiplying it onto the state:
+\texttt{Opsi = np.dot(O, psi)}.
 
-How can we represent the kinetic operator as a matrix?  Its action on
-a state (e.g. $\sin x$) must be to produce minus twice the
-second-order derivative of the state.
+How can we represent the action of the kinetic operator (which
+includes a second derivative) as a matrix?  Use the expression
+for the second derivative derived earlier.
 
-Find the wavefunctions of the lowest 5 
-
+Now we have a matrix representation of the kinetic operator; this
+is the Hamiltonian of non-interacting free particles in a box given by
+the size of our grid:
 \begin{align}
   \hat H = \hat T = -\frac12 \diff{^2}{x^2}
 \end{align}
+The Kohn--Sham states and eigenvalues are eigenvectors and
+eigenvalues of that matrix.  The matrix is real and symmetric, so we can use
+\texttt{np.linalg.eigh}.
+
+Plot the wavefunctions $\psi_n(x)$ with the lowest 5 energies.  What are the energies?
+
+\section{Harmonic oscillator}
+Now we include the external potential $v_{\mathrm{ext}}(x) = x^2$ in the Hamiltonian:
+\begin{align}
+  \hat H = \hat T = -\frac12 \diff{^2}{x^2} + x^2.
+\end{align}
+This is the harmonic oscillator for non-interacting particles.
+How can you represent $x^2$ as a matrix?
+
+Calculate the Hamiltonian and plot the 5 states with lowest energy,
+making sure that your grid represents the solution reasonably well.
+
+\section{Density}
+Next we need to calculate the electron density.
+
+Each state should be normalized so it integrates to one (having the
+capacity to contain one electron):
+\begin{align}
+  \int |\psi(x)|^2 \idee x = 1.
+\end{align}
+The normalization from \texttt{np.linalg.eigh} will be different.
+How do you calculate an integral over the grid?
+Make sure all the states integrate to 1.
+
+Then the electron density in DFT is given by
+\begin{align}
+  n(x) = \sum_n f_n |\psi_n(x)|^2,
+\end{align}
+where $f_n$ are the \emph{occupation numbers}.
+
+The electrons will
+preferentially occupy those available states with lowest energy.  Each
+state fits two electrons (one with spin up, and one with spin down), so
+a state can in general be occupied by 0, 1, or 2 electrons.
+
+Let us say that we have 6 electrons.  Then the three lowest states
+will have occupation number $f=2$ and all others $f=0$.
+
+Plot the electron density for 6 electrons in the harmonic potential.
+Verify that the density integrates to 6 electrons.
+
+\section{Exchange energy}
+The exchange (and correlation) energy is a correction to the
+electronic energy that approximates the effect of electron interactions.
+We considerhere only the exchange which is particularly simple in
+the local density approximation, LDA:
+\begin{align}
+  E_\X^\LDA[n] = \int n^{4/3} \idee
+\end{align}
+
+
+\section{Self-consistency loop}
+Write a loop
+
+\section{Coulomb potential}
+The electrostatic energy or Hartree energy is given by
+\begin{align}
+  E_{\mathrm{Ha}}^{\mathrm{3D}} = \frac12 \iint \frac{n(\mathbf r)n(\mathbf r')}{|\mathbf r - \mathbf r'|}\idee \mathbf r \idee \mathbf r'.
+\end{align}
+This expression converges in 3D, but not in 1D.  Hence we cheat and use
+a modified, ``softened'' form:
+\begin{align}
+E_{\mathrm{Ha}} = \frac12 \iint \frac{n(x) n(x')}{\sqrt{(x - x')^2 + 1}}.
+\idee x \idee x'
+\end{align}
+Calculate the (soft) Coulomb energy of the density from before.
+
+In the derivation of the Kohn--Sham equations, the potential is defined
+as the derivative of the total energy with respect to the density.
+The Coulomb \emph{potential} is therefore given by the derivative
+of the Coulomb energy with respect to the density:
+
+\begin{align}
+  v_{\mathrm{Ha}}(x) = \pdiff{E_{\mathrm{Ha}}}{n(x)} =
+  \int \frac{n(x)}{\sqrt{(x - x')^2 + 1}} \idee x
+\end{align}
+
+Calculate the Coulomb potential.
 
 
 \end{document}
