@@ -126,6 +126,9 @@ its representation $\{f(x_i)\}$ on the grid?  Calculate and verify using matplot
 numerical derivatives are correct.
 }
 
+Hint: The derivatives are not well defined at the \emph{ends} of the grid;
+exclude the first and/or last grid points to suit your needs.
+
 \noindent Numpy array examples:
 \lstinputlisting{script/numpyexamples.py}
 
@@ -146,6 +149,7 @@ How can we represent the kinetic operator ($-1/2$ times the second derivative)
 as a matrix?  Use the expression
 for the second derivative derived earlier.
 }
+Hint: If the function does not approach zero at the end of the grid, the derivative will be discontinuous there.  Do not worry about that, since our actual solutions will always approach zero at the ends.
 
 \noindent Now we have a matrix representation of the kinetic operator; this
 is the Hamiltonian of non-interacting free particles in a box given by
@@ -199,6 +203,7 @@ The normalization from \texttt{np.linalg.eigh} will be different.
 How do you calculate an integral over the grid?
 Normalize the states so they integrate to 1.
 }
+% no written solution
 
 Then the electron density in DFT is given by
 \begin{align}
