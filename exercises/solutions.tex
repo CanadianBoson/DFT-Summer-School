@@ -1,0 +1,136 @@
+\documentclass{article}
+\input{pre}
+
+\begin{document}
+\section{Derivatives}
+By definition,
+\begin{align}
+  f'(x) = \lim_{\delta\rightarrow 0} \frac{f(x + h) - f(x)}{h}.
+\end{align}
+On a uniform grid $\{x_i\}$, the smallest distance we can represent is the grid
+spacing.  A natural choice is therefore the following difference quotient:
+\begin{align}
+  f'(x) \approx \frac{f(x + h) - f(x)}{h},
+\end{align}
+where $h$ is the grid spacing.
+But this is a \emph{left} derivative: It uses $x$ and $x + h$ to
+approximate the derivative at $x$.  Intuition should tell us (right?) that
+it actually best approximates the derivative \emph{between} those two points,
+i.e., $f'(x + h/2)$, which is not part of our grid.
+If we are going to do computations with both $f$ and $f'$, we should wisely
+try to have them on the same grid so we can easily do arithmetic with them.
+We therefore write:
+%\begin{align}
+%  f'(x) \approx \frac{f(x + h/2) - f(x - h/2)}{h},
+%\end{align}
+%but then we get the derivative on a new grid, displaced by half a grid
+%spacing, $h/2$.  That would make it inconvenient if/when we need to
+%multiply the function by its derivative.  This is a better
+%approximation which also has the property that calculated derivatives
+%$f'$ remain on the same grid:
+\begin{align}
+  f'(x) \approx \frac{f(x + h) - f(x - h)}{2h}.
+\end{align}
+We say that this is a \emph{central} finite-difference
+derivative since the function values are symmetric around the point where we
+calculate the derivative.
+To get the second-order derivative, we apply this expression twice:
+\begin{align}
+  f''(x) &\approx \frac{1}{2h} \left[f'(x + h) - f'(x - h) \right] \nonumber\\
+  &= \frac{1}{4h^2} \left[
+  f(x + 2 h) - 2 f(x) + f(x - 2 h)
+  \right].
+\end{align}
+In this expression we only see differences of $2h$.   Hence we take $2h$ to
+be the grid spacing and rewrite accordingly:
+\begin{align}
+  f''(x) \approx \frac{1}{h^2}\left[f(x + h) - 2 f(x) + f(x - h)\right].
+\end{align}
+In conclusion, this is how we would calculate the second-order
+derivative from function values on a grid.
+
+One can use a higher-order Taylor expansion and obtain expressions that
+involve several other ``nearest neighbours'': $f(x), f(x \pm h), f(x \pm
+2h), \ldots$.  Such expressions give higher accuracy if the grid is fine
+enough.
+
+
+How can we represent the kinetic operator as a matrix?
+Note how the expression for the second derivative is a linear combination
+of function values at different (neighbouring) grid points.
+We arrange the coefficients $-2$ and $+1$ in the diagonal and the first off-diagonals.
+Then it is straightforward to verify that:
+\begin{align}
+  \mathbf T \mathbf y &=
+  -\frac{1}{2h^2} \left[
+    \begin{matrix}
+      -2 & \hphantom +1  & \hphantom + 0 & &\cdots& \hphantom + 0\\
+      \hphantom +1  & -2 & \hphantom +1 &       && \vdots\\
+      %0  & 1  & -2 & 1 & \\
+      \hphantom + 0 & \hphantom +1 & -2 &  &&  \\
+      %\vdots & & 1 & -2 & 1\\
+       & & & \ddots&   & \hphantom + 0\\
+      \vdots & & & &  -2& \hphantom +1\\
+      \hphantom + 0 & \cdots && \hphantom + 0 & \hphantom +1 & -2
+    \end{matrix}
+    \right]
+  \left[
+    \begin{matrix}
+    f(x_1)\\
+    \vdots\\
+    f(x_i)\\
+    \vdots\\
+    f(x_N)\\
+    \end{matrix}
+    \right]
+  \nonumber\\
+  &= -\frac{1}{2h^2} \left[
+    \begin{matrix}
+    \vdots\\
+    f(x_i - h) - 2 f(x_i) + f(x_i + h)\\
+    \vdots
+    \end{matrix}
+    \right].
+\end{align}
+
+\begin{figure}
+  \includegraphics[scale=0.5]{script/derivatives.pdf}
+  \caption{Derivatives calculated by finite differences, and action of
+    the kinetic operator $\hat T$.}\label{fig:deriv}
+\end{figure}
+
+
+\noindent All the derivatives are shown on Figure \ref{fig:deriv}.
+The script which calculates and plots them is this:
+\lstinputlisting{script/ex_fd_T.py}
+
+\section{Free particles and the harmonic oscillator}
+If we simply take $\mathbf T$ to be the whole Hamiltonian, we are
+non-interacting particles within a box as large as our grid.
+We get the independent-particle wavefunctions using this script:
+\lstinline{independent_particles.py}
+This gives the wavefunctions shown on Figure \ref{fig:box}.
+
+\begin{figure}
+  \includegraphics[scale=0.5]{script/particles_in_box.pdf}
+  \caption{Particles in a box.}
+  \label{fig:box}
+\end{figure}
+
+The second part of the above listed script adds a quadratic potential
+to obtain the wavefunctions for the harmonic oscillator, shown on Figure
+\ref{fig:harmonic}
+\begin{figure}
+  \includegraphics[scale=0.5]{script/harmonic_oscillator.pdf}
+  \caption{Harmonic oscillator, whose exact energies are $1/2, 3/2,
+    5/2, 7/2, \ldots$.  The calculated values are slightly off due
+  to the finite precision of the grid.}
+  \label{fig:harmonic}
+\end{figure}
+
+Finally we need to implement the different potentials and a
+self-consistency loop.
+
+\lstinputlisting{script/dft.py}
+
+\end{document}
