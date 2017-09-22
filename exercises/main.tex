@@ -1,52 +1,18 @@
 \documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{listings}
-\usepackage[usenames,dvipsnames]{color}
-\usepackage{boxedminipage}
+\input{pre}
 
-\lstset{%,
-  basicstyle=\small\ttfamily,
-  keywordstyle=\color{red},
-  identifierstyle=\color{Blue},
-  stringstyle=\color{OliveGreen},
-  commentstyle=\ttfamily\color{Green},
-  showstringspaces=false,
-  language=Python}%,
-%  basicstyle=\small\texttt}
-
-
-\newcommand{\exercise}[1]{
-  \bigskip
-  \begin{boxedminipage}[c]{0.8\linewidth}
-  #1
-  \end{boxedminipage}
-  \bigskip
-}
-
-\newcommand{\dee}[0]{\mathrm d}
-\newcommand{\idee}[0]{\,\dee}
-\newcommand{\diff}[2]{\frac{\dee #1}{\dee #2}}
-\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
-\newcommand{\Ha}[0]{\mathrm{Ha}}
-\newcommand{\XC}[0]{\mathrm{XC}}
-\newcommand{\X}[0]{\mathrm{X}}
-\newcommand{\LDA}[0]{\mathrm{LDA}}
-\newcommand{\ext}[0]{\mathrm{ext}}
-
-\title{Script a simple 1D DFT code in Python}
+\title{Write a simple 1D DFT code in Python}
 \author{Ask Hjorth Larsen}
 
 \begin{document}
+\maketitle
 
-\section{Towards a simple 1D DFT code}
+\section*{Overview}
 
 Our goal is to write our own Kohn--Sham (KS) density functional theory
 (DFT) code.
 
-A full-featured DFT code is very complex, so we shall here limit our ambitions
+A full-featured DFT code is very complex, so we limit our ambitions
 to the simplest possible model that is still interesting:
 We will iteratively solve the Kohn--Sham
 equations for a harmonic oscillator including electronic kinetic
@@ -58,12 +24,12 @@ which we write as
 \begin{align}
 \hat H = -\frac12 \diff{^2}{x^2} + v(x) = -\frac12 \diff{^2}{x^2} + v_\Ha(x) + v_{\mathrm X}^{\mathrm{LDA}}(x) + x^2.
 \end{align}
-Overview: We must be able to calculate the KS wavefunctions, the
+We must be able to calculate the KS wavefunctions, the
 density, and each of the potentials required to represent the
 Hamiltonian.  We must also represent the Hamiltonian somehow,
 including the kinetic operator.  But one thing at a time.
 
-\section{Python}
+\section*{Python}
 Python is a dynamically typed language.  Python programs are executed
 by the Python interpreter.
 There are two main versions:
@@ -91,11 +57,11 @@ hello world!
 hello
 >>>
 \end{verbatim}
-Note that the scope of the \texttt{for} loop is controlled by indentation.
+Note that the scope of the \lstinline{for} loop is controlled by indentation.
 The loop ends once the code is no longer indented.
 It is conventional to indent by 4 spaces in Python.
 
-Alternatively we can a script, opening our favourite text editor (gedit is the standard one in Ubuntu) and typing:
+Alternatively we can write a script, opening our favourite text editor (gedit is the standard one in Ubuntu) and typing:
 \begin{lstlisting}
 print('hello world!')
 \end{lstlisting}
@@ -109,7 +75,7 @@ things before adding them to the script.
 Use \lstinline{help(obj)} to see the documentation for any object
 (including functions and modules).
 
-\section{Grids}
+\section*{Grids}
 The simplest way to represent a real function $f(x)$,
 with $a \le x \le b$, is to
 sample it on a real-space grid of points $\{x_i\}$ from $a$ to $b$ with some
@@ -121,7 +87,7 @@ The function is then represented by the vector of values $\{f(x_i)\}$.
 \lstinputlisting{script/basicplot.py}
 
 \exercise{
-How do you approximate the first and second derivatives of a function from
+I. How do you approximate the first and second derivatives of a function from
 its representation $\{f(x_i)\}$ on the grid?  Calculate and verify using matplotlib that your
 numerical derivatives are correct.
 }
@@ -132,7 +98,7 @@ exclude the first and/or last grid points to suit your needs.
 \noindent Numpy array examples:
 \lstinputlisting{script/numpyexamples.py}
 
-\section{Free non-interacting electrons}
+\section*{Free non-interacting electrons}
 
 To get the Kohn--Sham wavefunctions we must diagonalize the
 Hamiltonian, i.e., calculate its eigenvectors.  We will establish a matrix
@@ -145,11 +111,11 @@ applied to a state $\psi(x)$ by left-multiplying it onto the state:
 \texttt{Opsi = np.dot(O, psi)}.
 
 \exercise{
-How can we represent the kinetic operator ($-1/2$ times the second derivative)
+II. How can we represent the kinetic operator ($-1/2$ times the second derivative)
 as a matrix?  Use the expression
 for the second derivative derived earlier.
 }
-Hint: If the function does not approach zero at the end of the grid, the derivative will be discontinuous there.  Do not worry about that, since our actual solutions will always approach zero at the ends.
+Hint: If the function does not approach zero at the end of the grid, the derivative will be discontinuous there.  Do not worry about that --- later, the solutions to differential equations will approach zero continuously at the ends of the grid.
 
 \noindent Now we have a matrix representation of the kinetic operator; this
 is the Hamiltonian of non-interacting free particles in a box given by
@@ -170,13 +136,13 @@ This tends to improve readability of code with many arrays.
 Thus, \lstinline{psi_gn[:, 0]} is the whole state vector of the first state,
 and \lstinline{psi_gn[:, :5]} is a 2D matrix including only the first five.
 
-\exercise{
+\exercise{III.
   Choose a grid and calculate the free-particle energies and wavefunctions.
   What are the eigenvalues?
   Plot the wavefunctions $\psi_n(x)$ with the lowest 5 energies.
 }
 
-\section{Harmonic oscillator}
+\section*{Harmonic oscillator}
 Now we include the external potential $v_{\mathrm{ext}}(x) = x^2$ in the Hamiltonian:
 \begin{align}
   \hat H = \hat T = -\frac12 \diff{^2}{x^2} + x^2.
@@ -185,12 +151,12 @@ This is the harmonic oscillator for non-interacting particles.
 How can you represent $x^2$ as a matrix?
 
 
-\exercise{
+\exercise{IV.
 Calculate the Hamiltonian and plot the 5 states with lowest energy,
 making sure that your grid is adequate.
 }
 
-\section{Density}
+\section*{Density}
 Next we need to calculate the electron density.
 Each state should be normalized so it integrates to one (having the
 capacity to contain one electron):
@@ -199,7 +165,7 @@ capacity to contain one electron):
 \end{align}
 The normalization from \texttt{np.linalg.eigh} will be different.
 
-\exercise{
+\exercise{V.
 How do you calculate an integral over the grid?
 Normalize the states so they integrate to 1.
 }
@@ -219,12 +185,12 @@ A state can therfore be occupied by 0, 1, or 2 electrons.
 Let us say that we have 6 electrons.  Then the three lowest states
 will have occupation number $f=2$ and all others $f=0$.
 
-\exercise{
+\exercise{VI.
 Calculate and plot the electron density for 6 electrons in the harmonic potential.
 Verify that the density integrates to 6 electrons.
 }
 
-\section{Exchange energy}
+\section*{Exchange energy}
 The exchange (and correlation) functional is a correction to the
 electronic energy that approximates the effect of electron interactions.
 To keep life simple, we consider only the exchange functional in the local density approximation (LDA) which is
@@ -241,7 +207,7 @@ of the exchange energy with respect to the density:
   n^{1/3}(x)
 \end{align}
 
-\exercise{Calculate the exchange potential and energy from the previously
+\exercise{VII. Calculate the exchange potential and energy from the previously
 calculated density.}
 
 It is useful to define a function to do this calculation:
@@ -255,9 +221,9 @@ mydensity = np.random.rand(10)
 energy, potential = calculate_exchange(mydensity)
 \end{lstlisting}
 
-\exercise{Write the calculation of exchange as a function.}
+\exercise{VIII. Write the calculation of exchange as a function.}
 
-\section{Coulomb potential}
+\section*{Coulomb potential}
 (If short of time, consider skipping this exercise for now and implement the
 self-consistency loop first, ignoring the Coulomb potential)
 
@@ -278,23 +244,22 @@ density:
   \int \frac{n(x')}{\sqrt{(x - x')^2 + 1}} \idee x'
 \end{align}
 
-\exercise{Write a function to calculate the Coulomb energy and potential,
+\exercise{IX. Write a function to calculate the Coulomb energy and potential,
   then plot the potential for the previous density.}
 
-\section{Self-consistency loop}
+\section*{Self-consistency loop}
 The self-consistency loop repeats the following steps:
 \begin{itemize}
 \item Exchange energy and potential from the density (you can start with a
   constant density, e.g. 0)
 \item Coulomb energy and potential from the density.
-\item The Hamiltonian from kinetic operator, external potential,
-  and exchange potential
+\item Hamiltonian from kinetic operator and potentials
 \item Wavefunctions and their energies from the Hamiltonian
 \item Density from the normalized wavefunctions and occupations
 \end{itemize}
 
 
-\exercise{
+\exercise{X.
   Implement the self-consistency loop and iterate enough times to converge
   and plot the density.
 }
@@ -305,7 +270,7 @@ When the
 density does not change anymore, the calculated quantities are
 \emph{self-consistent}, and the calculation is done.
 
-\section{Total energy}
+\section*{Total energy}
 The kinetic energy is
 \begin{align}
   T = \int \psi^*(x)\left(-\frac12 \diff{}{x^2}\right) \psi(x) \idee x
@@ -313,7 +278,7 @@ The kinetic energy is
 \end{align}
 where $v(x) = v_\Ha(x) + v_\X + x^2$ is the total potential.
 
-\exercise{
+\exercise{XI.
 Calculate the kinetic energy and each of the other energy contributions to get the final total energy:
 \begin{align}
   E &= \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x \nonumber\\
@@ -321,7 +286,7 @@ Calculate the kinetic energy and each of the other energy contributions to get t
 \end{align}
 }
 
-\section{The end}
+\section*{The end}
 
 The DFT code is now complete!  If you want, you can wrap it all in a
 single function whose parameters are the grid, the external potential,

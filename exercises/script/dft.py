@@ -3,7 +3,9 @@ import matplotlib.pyplot as plt
 
 xmax = 6.0  # Box size
 Ng = 200  # Number of grid points
-Nn = 4  # Number of states
+Nn = 3  # Number of states in our calculation
+# (The number of electrons is twice the number of
+#  states -- each state is double occupied.)
 
 x_g = np.linspace(-xmax, xmax, Ng)
 dx = x_g[1] - x_g[0]
@@ -34,43 +36,52 @@ def soft_poisson_solve(n_g):
         for j in range(Ng):
             vhartree_g[i] += n_g[j] / np.sqrt(1.0 + (x_g[i] - x_g[j])**2)
     vhartree_g *= dx
-    return vhartree_g
+    Ehartree = 0.5 * (vhartree_g * n_g).sum() * dx
+    return Ehartree, vhartree_g
 
 
-density_change_integral = 1.0
-while density_change_integral > 1e-6:
+def calculate_exchange(n_g):
+    vx_g = -(3.0 / np.pi * n_g)**(1.0 / 3.0)
+    Ex_prefactor = -3.0 / 4.0 * (3.0 / np.pi)**(1.0 / 3.0)
+    Ex = Ex_prefactor * (n_g**(4.0 / 3.0)).sum() * dx
+    return Ex, vx_g
+
+
+density_change = 1.0
+while density_change > 1e-6:
     # Calculate Hamiltonian
     veff_g = vext_g + vhartree_g + vx_g
     H_gg = T_gg + np.diag(veff_g)  # Hamiltonian
 
     # Solve KS equations
     eps_n, psi_gn = np.linalg.eigh(H_gg)
-    print('Energies', ' '.join('{:4f}'.format(eps) for eps in eps_n[:Nn]))
+    print('Energies', ' '.join('{:4f}'.format(eps)
+                               for eps in eps_n[:Nn]))
 
-    # Normalize states (states are normalized, but not in our dx metric)
+    # Normalize states.  The states are normalized
+    # already, but not in our dx metric
     psi_gn /= np.sqrt(dx)
 
     # Update density
     nold_g = n_g
     n_g = 2.0 * (psi_gn[:, :Nn]**2).sum(axis=1)
-    density_change_integral = np.abs(nold_g - n_g).sum() * dx
+    density_change = np.abs(nold_g - n_g).sum() * dx
 
     charge = n_g.sum() * dx
     print('Number of electrons', charge)
-    print('Convergence err', density_change_integral)
+    print('Convergence err', density_change)
     assert abs(charge - 2.0 * Nn) < 1e-14
 
     # Calculate Hartree potential
-    vhartree_g = soft_poisson_solve(n_g)
-    Ehartree = 0.5 * (vhartree_g * n_g).sum() * dx
+    Ehartree, vhartree_g = soft_poisson_solve(n_g)
     print('Electrostatic energy', Ehartree)
 
-    # Calculate exchange potential (we won't bother with correlation!)
-    vx_g = -(3. / np.pi * n_g)**(1. / 3.)
-    Ex = -3. / 4. * (3. / np.pi)**(1. / 3.) * (n_g**(4. / 3.)).sum() * dx
+    # Calculate exchange potential
+    # (we won't bother with correlation!)
+    Ex, vx_g = calculate_exchange(n_g)
     print('Exchange energy', Ex)
 
-    Ebs = 2.0 * eps_n[:Nn].sum()  # Band structure energy
+    Ebs = 2.0 * eps_n[:Nn].sum()  # "Band structure" energy
     Ekin = Ebs - (veff_g * n_g).sum() * dx
     print('Ekin', Ekin)
     Epot = Ehartree + Ex + (vext_g * n_g).sum() * dx
@@ -78,7 +89,9 @@ while density_change_integral > 1e-6:
     Etot = Ekin + Epot
     print('Energy', Etot)
 
-for i, psi_g in enumerate(psi_gn[:, :Nn].T):
-    plt.plot(x_g, psi_g, label='n={}, e={:3f}'.format(i + 1, eps_n[i]))
+
+for i in range(Nn):
+    plt.plot(x_g, psi_gn[:, i],
+             label='n={}, e={:3f}'.format(i + 1, eps_n[i]))
     plt.legend(loc='lower right')
 plt.show()
