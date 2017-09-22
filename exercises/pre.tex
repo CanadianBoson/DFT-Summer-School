@@ -1,0 +1,36 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{boxedminipage}
+\usepackage{graphicx}
+
+\lstset{%,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{red},
+  identifierstyle=\color{Blue},
+  stringstyle=\color{Orange},
+  commentstyle=\ttfamily\color{Green},
+  showstringspaces=false,
+  language=Python}%,
+%  basicstyle=\small\texttt}
+
+
+\newcommand{\exercise}[1]{
+  \bigskip
+  \begin{boxedminipage}[c]{0.8\linewidth}
+  #1
+  \end{boxedminipage}\bigskip\\
+}
+
+\newcommand{\dee}[0]{\mathrm d}
+\newcommand{\idee}[0]{\,\dee}
+\newcommand{\diff}[2]{\frac{\dee #1}{\dee #2}}
+\newcommand{\pdiff}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\Ha}[0]{\mathrm{Ha}}
+\newcommand{\XC}[0]{\mathrm{XC}}
+\newcommand{\X}[0]{\mathrm{X}}
+\newcommand{\LDA}[0]{\mathrm{LDA}}
+\newcommand{\ext}[0]{\mathrm{ext}}
