@@ -135,7 +135,8 @@ Universidad del País Vasco UPV/EHU, San Sebastián, Spain}
 
 \begin{frame}
   \frametitle{Memory and multilevel caching}
-  Example: Intel i7-4770 Haswell architecture\\
+  CPU $\leftrightarrow$ L1 cache $\leftrightarrow$ L2 cache ($\leftrightarrow$ L3 cache?) $\leftrightarrow$ main memory\\
+  Example: Intel i7-4770 Haswell architecture, 3.4 GHz\\
   \medskip
   \begin{tabular}{llll}
      & Size & Latency & Total \\
@@ -306,7 +307,7 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \end{block}
   \begin{itemize}
   \item Standard interface for standard operations:
-    Matrix multiplication
+    Matrix multiplication, scalar multiplication/addition, \ldots
   \item Highly optimized for different platforms individually
   \end{itemize}
   \begin{block}{Some BLAS implementations}
@@ -396,12 +397,12 @@ a[i + 3] = b[i + 3] * c[i + 3];
 
 \begin{frame}
   \frametitle{Parallel pitfalls and deadlocks}
-  \begin{block}{Example 2}
+  \begin{block}{Example 2 (NSSY2017)}
     \begin{itemize}
-    \item Process A reserves Sala Capitular for this talk
-    \item Process B attempts to reserve Sala Capitular for this talk,
-      but Sala Capitular is already reserved for some talk
-    \item Process B schedules this talk for another lecture room
+    \item Process A reserves Sala Capitular for HPC talk
+    \item Process B attempts to reserve Sala Capitular for HPC talk,
+      but Sala Capitular is already reserved for a talk
+    \item Process B schedules HPC talk for another lecture room
     \item \ldots
   %\item Resource A is blocked by process N
   %\item Process N waits for resource B
@@ -511,6 +512,24 @@ a[i + 3] = b[i + 3] * c[i + 3];
   \includegraphics[width=0.7\textwidth]{quinde.jpg}
   \end{figure}
 \end{frame}
+
+\begin{frame}
+  \begin{columns}
+    \begin{column}{.4\textwidth}
+  \begin{itemize}
+  \item \small{Performance of fastest supercomputers in giga-floating-point operations per second (GFlop/s)}
+  \item \small{Current \#1:\\ 120 PFlop/s}
+  \item \small{\#500:\\ 715 TFlop/s}
+  \item \small{Quinde:\\ 232--352 TFlop/s}
+  \end{itemize}
+    \end{column}
+    \begin{column}{.75\textwidth}
+      \includegraphics[width=1.\textwidth]{supercomputers.png}
+    \end{column}
+  \end{columns}
+  \tiny{Sources: Wikipedia (graphics), top500.org (data)\\\url{https://www.top500.org/statistics/perfdevel/}\\Quinde: \url{https://www.eltelegrafo.com.ec/noticias/tecnologia/1/yachay-ep-entrega-el-supercomputador-quinde-i-a-la-comunidad-cientifica-de-ecuador}}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Massively parallel architectures}
