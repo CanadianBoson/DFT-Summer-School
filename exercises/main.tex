@@ -75,6 +75,10 @@ things before adding them to the script.
 Use \lstinline{help(obj)} to see the documentation for any object
 (including functions and modules).
 
+If you are entirely unfamiliar with Python, be sure to have a look at
+the official Python tutorial.  You will need to know basic things like
+printing and writing loops.
+
 \section*{Grids}
 The simplest way to represent a real function $f(x)$,
 with $a \le x \le b$, is to
@@ -87,15 +91,17 @@ The function is then represented by the vector of values $\{f(x_i)\}$.
 \lstinputlisting{script/basicplot.py}
 
 \exercise{
-I. How do you approximate the first and second derivatives of a function from
-its representation $\{f(x_i)\}$ on the grid?  Calculate and verify using matplotlib that your
+I. How would you approximate the first and second derivatives of a function from
+its representation $\{f(x_i)\}$ on the grid using finite differences?
+Calculate and verify using matplotlib that your
 numerical derivatives are correct.
 }
 
-Hint: The derivatives are not well defined at the \emph{ends} of the grid;
-exclude the first and/or last grid points to suit your needs.
+\noindent Hint: The derivatives may not be well defined at the
+\emph{ends} of the grid; exclude the first and/or last grid points to
+suit your needs.
 
-\noindent Numpy array examples:
+\noindent Here are some examples of how to work with Numpy arrays:
 \lstinputlisting{script/numpyexamples.py}
 
 \section*{Free non-interacting electrons}
@@ -105,7 +111,7 @@ Hamiltonian, i.e., calculate its eigenvectors.  We will establish a matrix
 representation of the Hamiltonian starting with the kinetic operator
 $\hat T$.
 
-If our grid has $N$ points, then all possible linear operators on that
+If our grid has $N$ points, then linear operators on that
 space are represented by $N\times N$ matrices.  An operator $O$ is
 applied to a state $\psi(x)$ by left-multiplying it onto the state:
 \texttt{Opsi = np.dot(O, psi)}.
@@ -115,7 +121,7 @@ II. How can we represent the kinetic operator ($-1/2$ times the second derivativ
 as a matrix?  Use the expression
 for the second derivative derived earlier.
 }
-Hint: If the function does not approach zero at the end of the grid, the derivative will be discontinuous there.  Do not worry about that --- later, the solutions to differential equations will approach zero continuously at the ends of the grid.
+%Hint: If your test function does not approach zero at the end of the grid, the derivative will be discontinuous there.  Do not worry about that --- later, the solutions to differential equations will approach zero continuously at the ends of the grid.
 
 \noindent Now we have a matrix representation of the kinetic operator; this
 is the Hamiltonian of non-interacting free particles in a box given by
@@ -125,7 +131,7 @@ the size of our grid:
 \end{align}
 The Kohn--Sham states and their energies are the eigenvectors and
 eigenvalues of that matrix.  The matrix is real and symmetric, so both eigenvalues and eigenvectors are real and we can use
-\texttt{np.linalg.eigh}:
+\texttt{np.linalg.eigh} which is for Hermitian matrices:
 \begin{lstlisting}
 epsilon_n, psit_gn = np.linalg.eigh(T)
 \end{lstlisting}
@@ -157,7 +163,9 @@ making sure that your grid is adequate.
 }
 
 \section*{Density}
-Next we need to calculate the electron density.
+We will want to include both the Coulomb or Hartree interaction
+as well as LDA exchange, both of which are density functionals.
+Hence we need to calculate the electron density.
 Each state should be normalized so it integrates to one (having the
 capacity to contain one electron):
 \begin{align}
@@ -166,7 +174,7 @@ capacity to contain one electron):
 The normalization from \texttt{np.linalg.eigh} will be different.
 
 \exercise{V.
-How do you calculate an integral over the grid?
+How do you calculate the integral of a function on the grid?
 Normalize the states so they integrate to 1.
 }
 % no written solution
@@ -177,7 +185,7 @@ Then the electron density in DFT is given by
 \end{align}
 where $f_n$ are the \emph{occupation numbers}.
 
-The electrons will
+In DFT we calculate the ground state: The electrons will
 occupy the states with lowest energy.  Each
 state fits up to two electrons: one with spin up, and one with spin down.
 A state can therfore be occupied by 0, 1, or 2 electrons.
@@ -191,9 +199,14 @@ Verify that the density integrates to 6 electrons.
 }
 
 \section*{Exchange energy}
-The exchange (and correlation) functional is a correction to the
-electronic energy that approximates the effect of electron interactions.
-To keep life simple, we consider only the exchange functional in the local density approximation (LDA) which is
+The exchange--correlation functional is a correction to the
+electronic energy that approximates the effect of electron
+interactions.\footnote{The Hartree interaction is the interaction between the electron density and itself.  The exchange interaction
+  includes a correction to the Hartree interaction, so in a sense it is unphysical to implement exchange \emph{before} Hartree interaction.
+We do it anyway because the LDA exchange expression is simpler than the Hartree interaction.}
+To keep life simple, we ignore correlation because its expression
+is more tedious than interesting to implement.
+Consider therefore the exchange functional in the local density approximation (LDA) which is
 \begin{align}
   E_\X^\LDA[n] = -\frac 34 \left(\frac 3 \pi\right)^{1/3} \int n^{4/3} \idee x
 \end{align}
@@ -248,7 +261,7 @@ density:
   then plot the potential for the previous density.}
 
 \section*{Self-consistency loop}
-The self-consistency loop repeats the following steps:
+The self-consistency loop repeats the following steps, calculating:
 \begin{itemize}
 \item Exchange energy and potential from the density (you can start with a
   constant density, e.g. 0)
