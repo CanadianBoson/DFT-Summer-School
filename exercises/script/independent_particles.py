@@ -41,7 +41,7 @@ print(eps_n[:Nn])
 plt.figure()
 for i in range(Nn):
 #for i, psi_g in enumerate(psi_gn[:, :Nn].T):
-    plt.plot(x_g, psi_g,
+    plt.plot(x_g, psi_gn,
              label='n={}, e={:3f}'.format(i + 1, eps_n[i]))
 plt.legend(loc='best')
 plt.savefig('harmonic_oscillator.pdf')
