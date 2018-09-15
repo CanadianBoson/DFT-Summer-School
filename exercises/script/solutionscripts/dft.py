@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-xmax = 6.0  # Box size
+xmax = 5.0
 Ng = 200  # Number of grid points
-Nn = 4  # Number of states
+Nn = 3  # Number of states
 
 x_g = np.linspace(-xmax, xmax, Ng)
 dx = x_g[1] - x_g[0]
@@ -11,19 +11,18 @@ dx = x_g[1] - x_g[0]
 vext_g = 0.5 * x_g**2  # External potential
 
 T_gg = np.zeros((Ng, Ng))  # Kinetic operator
-for i in range(Ng):
+for i in range(Ng - 1):
     T_gg[i, i] = -2.0
-    if i > 0:
-        T_gg[i, i - 1] = 1.0
-        T_gg[i - 1, i] = 1.0
+    T_gg[i, i + 1] = 1.0
+    T_gg[i + 1, i] = 1.0
+T_gg[-1, -1] = -2.0
 T_gg *= -0.5 / dx**2
 
-# Initialize density as even:
+# Initialize density as constant, with Nn electrons in total:
 n_g = 2.0 * Nn / (Ng * dx) * np.ones(Ng)
 print('Initial charge', n_g.sum() * dx)
 
 # Nn states, each one doubly occupied.
-# Initialize as constant density:
 vhartree_g = np.zeros(Ng)
 vx_g = np.zeros(Ng)
 
@@ -34,7 +33,15 @@ def soft_poisson_solve(n_g):
         for j in range(Ng):
             vhartree_g[i] += n_g[j] / np.sqrt(1.0 + (x_g[i] - x_g[j])**2)
     vhartree_g *= dx
-    return vhartree_g
+
+    Ehartree = 0.5 * (vhartree_g * n_g).sum() * dx
+    return Ehartree, vhartree_g
+
+
+def calculate_exchange(n_g):
+    vx_g = -(3. / np.pi * n_g)**(1. / 3.)
+    Ex = -3. / 4. * (3. / np.pi)**(1. / 3.) * (n_g**(4. / 3.)).sum() * dx
+    return Ex, vx_g
 
 
 density_change_integral = 1.0
@@ -61,13 +68,11 @@ while density_change_integral > 1e-6:
     assert abs(charge - 2.0 * Nn) < 1e-14
 
     # Calculate Hartree potential
-    vhartree_g = soft_poisson_solve(n_g)
-    Ehartree = 0.5 * (vhartree_g * n_g).sum() * dx
+    Ehartree, vhartree_g = soft_poisson_solve(n_g)
     print('Electrostatic energy', Ehartree)
 
     # Calculate exchange potential (we won't bother with correlation!)
-    vx_g = -(3. / np.pi * n_g)**(1. / 3.)
-    Ex = -3. / 4. * (3. / np.pi)**(1. / 3.) * (n_g**(4. / 3.)).sum() * dx
+    Ex, vx_g = calculate_exchange(n_g)
     print('Exchange energy', Ex)
 
     Ebs = 2.0 * eps_n[:Nn].sum()  # Band structure energy
@@ -78,7 +83,8 @@ while density_change_integral > 1e-6:
     Etot = Ekin + Epot
     print('Energy', Etot)
 
-for i, psi_g in enumerate(psi_gn[:, :Nn].T):
+for i in range(Nn):
+    psi_g = psi_gn[:, i]
     plt.plot(x_g, psi_g, label='n={}, e={:3f}'.format(i + 1, eps_n[i]))
-    plt.legend(loc='lower right')
+    plt.legend(loc='best')
 plt.show()
