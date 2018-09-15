@@ -136,7 +136,7 @@ The Kohn--Sham states and their energies are the eigenvectors and
 eigenvalues of that matrix.  The matrix is real and symmetric, so both eigenvalues and eigenvectors are real and we can use
 \texttt{np.linalg.eigh} which is for Hermitian matrices:
 \begin{lstlisting}
-epsilon_n, psit_gn = np.linalg.eigh(T)
+epsilon_n, psi_gn = np.linalg.eigh(T)
 \end{lstlisting}
 Above, we use \lstinline{_n} as a hint that the array has an element for each
 state,
@@ -289,7 +289,7 @@ density does not change anymore, the calculated quantities are
 \section*{Total energy}
 The kinetic energy is
 \begin{align}
-  T = \int \psi^*(x)\left(-\frac12 \diff{}{x^2}\right) \psi(x) \idee x
+  T = \int \psi^*(x)\left(-\frac12 \diff{^2}{x^2}\right) \psi(x) \idee x
   = \sum_n f_n \epsilon_n - \int n(x) v(x) \idee x,
 \end{align}
 where $v(x) = v_\Ha(x) + v_\X + x^2$ is the total potential.

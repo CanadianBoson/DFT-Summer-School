@@ -9,6 +9,6 @@ array *= 2  # Multiply all elements in-place
 
 array2D = np.random.rand(4, 8)  # 4 x 8 random numbers
 print(array2D)  # Print whole array
-print(array2D[:, 0])  # Print first row
-print(array2D[:, 7])  # Print last row
-print(array2D[0, :])  # Print first column
+print(array2D[:, 0])  # Print first column
+print(array2D[:, 7])  # Print last column
+print(array2D[0, :])  # Print first row
