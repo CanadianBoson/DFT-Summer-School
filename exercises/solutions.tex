@@ -5,20 +5,21 @@
 \section{Derivatives}
 By definition,
 \begin{align}
-  f'(x) = \lim_{\delta\rightarrow 0} \frac{f(x + h) - f(x)}{h}.
+  f'(x) = \lim_{\delta\rightarrow 0} \frac{f(x + \delta) - f(x)}{\delta}.
 \end{align}
 On a uniform grid $\{x_i\}$, the smallest distance we can represent is the grid
-spacing.  A natural choice is therefore the following difference quotient:
+spacing, $h$.
+A natural choice is therefore the following difference quotient:
 \begin{align}
-  f'(x) \approx \frac{f(x + h) - f(x)}{h},
+  f'(x) \approx \frac{f(x + h) - f(x)}{h}.
 \end{align}
-where $h$ is the grid spacing.
 But this is a \emph{left} derivative: It uses $x$ and $x + h$ to
 approximate the derivative at $x$.  Intuition should tell us (right?) that
 it actually best approximates the derivative \emph{between} those two points,
 i.e., $f'(x + h/2)$, which is not part of our grid.
 If we are going to do computations with both $f$ and $f'$, we should wisely
-try to have them on the same grid so we can easily do arithmetic with them.
+try to have them on the \emph{same} grid so we can easily do
+arithmetic with them.
 We therefore write:
 %\begin{align}
 %  f'(x) \approx \frac{f(x + h/2) - f(x - h/2)}{h},
@@ -106,6 +107,7 @@ The script which calculates and plots them is this:
 
 \section{Free particles and the harmonic oscillator}
 If we simply take $\mathbf T$ to be the whole Hamiltonian, we are
+calculating
 non-interacting particles within a box as large as our grid.
 We get the independent-particle wavefunctions using this script:
 \lstinline{independent_particles.py}
@@ -119,7 +121,7 @@ This gives the wavefunctions shown on Figure \ref{fig:box}.
 
 The second part of the above listed script adds a quadratic potential
 to obtain the wavefunctions for the harmonic oscillator, shown on Figure
-\ref{fig:harmonic}
+\ref{fig:harmonic}.
 \begin{figure}
   \includegraphics[scale=0.5]{script/harmonic_oscillator.pdf}
   \caption{Harmonic oscillator, whose exact energies are $1/2, 3/2,
